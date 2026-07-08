@@ -1,0 +1,80 @@
+src/
+│
+├── api/
+│   ├── client.ts            // Axios instance
+│   └── index.ts
+│
+├── components/
+│   ├── common/
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Table.tsx
+│   │   ├── Modal.tsx
+│   │   ├── Loader.tsx
+│   │   └── Pagination.tsx
+│   │
+│   ├── layout/
+│   │   ├── Navbar.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── Header.tsx
+│   │   └── Layout.tsx
+│   │
+│   └── shared/
+│       └── ProtectedRoute.tsx
+│
+├── hooks/
+│   ├── useAuth.ts
+│   ├── useUsers.ts
+│   ├── useRoles.ts
+│   ├── useModules.ts
+│   ├── usePermissions.ts
+│   └── useAuditLogs.ts
+│
+├── layouts/
+│   ├── DashboardLayout.tsx
+│   └── AuthLayout.tsx
+│
+├── pages/
+│   ├── Login.tsx
+│   ├── VerifyOtp.tsx
+│   ├── Dashboard.tsx
+│   ├── Users.tsx
+│   ├── Roles.tsx
+│   ├── Modules.tsx
+│   ├── Permissions.tsx
+│   ├── AuditLogs.tsx
+│   ├── Profile.tsx
+│   └── NotFound.tsx
+│
+├── routes/
+│   ├── AppRoutes.tsx
+│   └── ProtectedRoute.tsx
+│
+├── services/
+│   ├── auth.service.ts
+│   ├── user.service.ts
+│   ├── role.service.ts
+│   ├── module.service.ts
+│   ├── permission.service.ts
+│   ├── audit.service.ts
+│   └── file.service.ts
+│
+├── store/
+│   └── authStore.ts
+│
+├── types/
+│   ├── auth.ts
+│   ├── user.ts
+│   ├── role.ts
+│   ├── module.ts
+│   ├── permission.ts
+│   └── audit.ts
+│
+├── utils/
+│   ├── storage.ts
+│   ├── date.ts
+│   └── helpers.ts
+│
+├── App.tsx
+├── main.tsx
+└── index.css

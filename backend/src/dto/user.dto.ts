@@ -1,0 +1,11 @@
+export type CreateUserDto = {
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+};
+
+export type UpdateUserDto = {
+    name?: string;
+    role?: string;
+};
