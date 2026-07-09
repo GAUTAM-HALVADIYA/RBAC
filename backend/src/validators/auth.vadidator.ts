@@ -23,14 +23,6 @@ export const registerSchema = z.object({
                 message: "Password must be at least 6 characters",
             }),
         ),
-
-    role: z
-        .string({
-            required_error: "Role ID is required",
-        })
-        .length(24, {
-            message: "Invalid Role ID",
-        }),
 });
 
 export const loginSchema = z.object({

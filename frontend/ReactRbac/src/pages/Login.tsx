@@ -1,29 +1,62 @@
+import { useState } from "react";
+import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+
 export default function Login() {
-  return (
-    <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
-      <div className="container d-flex justify-content-center">
-        <div className="card glass-panel border-0 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
-          <div className="card-body p-5">
-            <h2 className="text-center mb-4 fw-bold" style={{ color: 'var(--text-main)' }}>Welcome Back</h2>
-            <p className="text-center text-muted mb-4">Please login to your RBAC account</p>
-            <form>
-              <div className="mb-4">
-                <label className="form-label fw-medium text-muted small">Email Address</label>
-                <input type="email" className="form-control form-control-lg" placeholder="admin@example.com" />
-              </div>
 
-              <div className="mb-4">
-                <label className="form-label fw-medium text-muted small">Password</label>
-                <input type="password" className="form-control form-control-lg" placeholder="••••••••" />
-              </div>
+	const { loading, error, login } = useAuth();
+    const navigate = useNavigate();
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+    });
 
-              <button className="btn btn-primary w-100 btn-lg" type="submit">
-                Sign In
-              </button>
-            </form>
-          </div>
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+    };
+
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        const response = await login(formData);
+
+        if (!response) return;
+        sessionStorage.setItem("correntVerifyEmail", formData.email);
+        navigate("/verify-otp", { replace: true });
+    };
+
+    return (
+        <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+            <div className="container d-flex justify-content-center">
+                <div className="card glass-panel border-0 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
+                    <div className="card-body p-5">
+                        <h2 className="text-center mb-4 fw-bold" style={{ color: "var(--text-main)" }}>
+                            Welcome Back
+                        </h2>
+                        <p className="text-center text-muted mb-4">Please login to your RBAC account</p>
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-4">
+                                <label className="form-label fw-medium text-muted small">Email Address</label>
+                                <input type="email" name="email" className="form-control form-control-lg" placeholder="user@example.com" onChange={handleChange}/>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="form-label fw-medium text-muted small">Password</label>
+                                <input type="password" name="password" className="form-control form-control-lg" placeholder="••••••••" onChange={handleChange} />
+                            </div>
+
+                            {error && <span className="text-danger">{error}</span>}
+
+                            <button className="btn btn-primary w-100 btn-lg" type="submit" disabled={loading}>
+                                {loading ? "Loading..." : "Sign In"}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 }

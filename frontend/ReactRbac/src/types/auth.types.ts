@@ -2,7 +2,6 @@ export interface RegisterRequest {
     name: string;
     email: string;
     password: string;
-    role: string;
 }
 
 export interface RegisterResponse {
@@ -12,4 +11,8 @@ export interface RegisterResponse {
 export interface VerifyOpt {
     email: string;
     otp: string;
+}
+export interface LoginRequest {
+    email: string;
+    password: string;
 }

@@ -11,12 +11,14 @@ import { RegisterDto, LoginDto, VerifyOtpDto, ForgotPasswordDto, ResetPasswordDt
 
 export class AuthService {
     async register(data: RegisterDto) {
-        const { name, email, password, role } = data;
+        const { name, email, password } = data;
 
-        const roleExists = await roleModel.findById(role);
-        if (!roleExists) {
+        const defaultRole = await roleModel.findOne({ name: "User" });
+        if (!defaultRole) {
             throw new AppError(HTTP_STATUS.NOT_FOUND, MESSAGES.ROLE_NOT_FOUND);
         }
+
+        const role = defaultRole._id;
 
         const existingUser = await userModel.findOne({ email });
         if (existingUser) {

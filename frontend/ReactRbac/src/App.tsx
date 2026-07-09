@@ -17,12 +17,10 @@ function App() {
     return (
         
             <Routes>
-                {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/verify-otp" element={<VerifyOtp />} />
 
-                {/* Protected Routes */}
                 <Route
                     path="/"
                     element={
@@ -88,7 +86,6 @@ function App() {
                     }
                 />
 
-                {/* Catch All */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
        
