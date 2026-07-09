@@ -1,14 +1,18 @@
 import React from 'react';
+import { Button as BootstrapButton, type ButtonProps as BootstrapButtonProps } from 'react-bootstrap';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+interface ButtonProps extends BootstrapButtonProps {
+    children: React.ReactNode;
+}
 
 export default function Button({ children, className, ...props }: ButtonProps) {
   return (
-    <button 
-      className={`px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors ${className}`}
+    <BootstrapButton 
+      variant="primary"
+      className={`btn-primary shadow-sm ${className || ''}`}
       {...props}
     >
       {children}
-    </button>
+    </BootstrapButton>
   );
 }

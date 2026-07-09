@@ -1,29 +1,47 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Nav } from 'react-bootstrap';
+import { LayoutDashboard, Users, Shield, Box, Key, FileText } from 'lucide-react';
 
 export default function Sidebar() {
-  const links = ['Dashboard', 'Users', 'Roles', 'Modules', 'Permissions', 'Audit Logs'];
+  const links = [
+    { name: 'Dashboard', icon: <LayoutDashboard size={18} /> },
+    { name: 'Users', icon: <Users size={18} /> },
+    { name: 'Roles', icon: <Shield size={18} /> },
+    { name: 'Modules', icon: <Box size={18} /> },
+    { name: 'Permissions', icon: <Key size={18} /> },
+    { name: 'Audit Logs', icon: <FileText size={18} /> }
+  ];
+  
   const location = useLocation();
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-brand">Security OS</div>
-      <nav className="sidebar-nav">
+      <div className="sidebar-brand">
+        <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, var(--primary-color), var(--primary-hover))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Shield color="white" size={20} />
+        </div>
+        Security OS
+      </div>
+      <Nav className="flex-column sidebar-nav gap-2">
         {links.map((link) => {
-          const path = `/${link.toLowerCase().replace(' ', '-')}`;
+          const path = `/${link.name.toLowerCase().replace(' ', '-')}`;
           const isActive = location.pathname === path || (path === '/dashboard' && location.pathname === '/');
           
           return (
-            <Link 
-              key={link} 
-              to={path} 
-              className={`nav-link ${isActive ? 'active' : ''}`}
-            >
-              {link}
-            </Link>
+            <Nav.Item key={link.name}>
+              <Nav.Link 
+                as={Link}
+                to={path} 
+                className={`nav-link-custom ${isActive ? 'active' : ''}`}
+              >
+                {link.icon}
+                {link.name}
+              </Nav.Link>
+            </Nav.Item>
           );
         })}
-      </nav>
+      </Nav>
     </aside>
   );
 }

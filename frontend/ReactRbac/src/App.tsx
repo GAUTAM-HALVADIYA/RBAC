@@ -1,6 +1,6 @@
 import "./App.css";
 import Login from "./pages/Login";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/shared/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Users from "./pages/Users";
@@ -15,7 +15,7 @@ import Register from "./pages/Register";
 
 function App() {
     return (
-        <BrowserRouter>
+        
             <Routes>
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
@@ -91,7 +91,7 @@ function App() {
                 {/* Catch All */}
                 <Route path="*" element={<NotFound />} />
             </Routes>
-        </BrowserRouter>
+       
 		// <Login/>
     );
 }

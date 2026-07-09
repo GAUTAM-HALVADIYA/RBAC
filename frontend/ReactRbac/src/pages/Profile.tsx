@@ -1,19 +1,27 @@
 import Layout from '../components/layout/Layout';
 import Header from '../components/layout/Header';
+import { Card } from 'react-bootstrap';
 
 export default function Profile() {
   return (
     <Layout>
       <Header title="My Profile" />
-      <div className="bg-white p-6 rounded-lg shadow-sm border max-w-2xl">
-        <div className="flex items-center gap-6 mb-8">
-          <div className="w-24 h-24 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-3xl font-bold">A</div>
-          <div>
-            <h2 className="text-2xl font-bold">Admin User</h2>
-            <p className="text-gray-500">Super Admin</p>
+      <Card className="glass-panel border-0 shadow-sm" style={{ maxWidth: '600px' }}>
+        <Card.Body className="p-4">
+          <div className="d-flex align-items-center gap-4 mb-4">
+            <div 
+              className="d-flex align-items-center justify-content-center rounded-circle"
+              style={{ width: '96px', height: '96px', background: 'linear-gradient(135deg, var(--primary-color), var(--primary-hover))', color: 'white', fontSize: '2rem', fontWeight: 'bold' }}
+            >
+              A
+            </div>
+            <div>
+              <h2 className="fw-bold mb-1" style={{ color: 'var(--text-main)' }}>Admin User</h2>
+              <p className="text-muted mb-0">Super Admin</p>
+            </div>
           </div>
-        </div>
-      </div>
+        </Card.Body>
+      </Card>
     </Layout>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Table as BootstrapTable } from 'react-bootstrap';
 
 interface TableProps {
   headers: string[];
@@ -7,8 +8,8 @@ interface TableProps {
 
 export default function Table({ headers, data }: TableProps) {
   return (
-    <div style={{ overflowX: 'auto' }}>
-      <table className="data-table">
+    <div className="table-responsive">
+      <BootstrapTable hover className="table-custom mb-0">
         <thead>
           <tr>
             {headers.map((header, idx) => (
@@ -18,7 +19,7 @@ export default function Table({ headers, data }: TableProps) {
         </thead>
         <tbody>
           {data.length === 0 ? (
-            <tr><td colSpan={headers.length} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No data available</td></tr>
+            <tr><td colSpan={headers.length} className="text-center text-muted py-4">No data available</td></tr>
           ) : (
             data.map((row, idx) => (
               <tr key={idx}>
@@ -29,7 +30,7 @@ export default function Table({ headers, data }: TableProps) {
             ))
           )}
         </tbody>
-      </table>
+      </BootstrapTable>
     </div>
   );
 }

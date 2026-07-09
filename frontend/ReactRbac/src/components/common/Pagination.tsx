@@ -1,14 +1,17 @@
 import React from 'react';
+import { Pagination as BootstrapPagination } from 'react-bootstrap';
 
 export default function Pagination() {
   return (
-    <div className="flex justify-between items-center py-3">
-      <span className="text-sm text-gray-600">Showing 1 to 10 of 50 entries</span>
-      <div className="flex gap-2">
-        <button className="px-3 py-1 border rounded hover:bg-gray-100">Prev</button>
-        <button className="px-3 py-1 border rounded bg-blue-600 text-white">1</button>
-        <button className="px-3 py-1 border rounded hover:bg-gray-100">Next</button>
-      </div>
+    <div className="d-flex justify-content-between align-items-center py-3">
+      <span className="text-muted small">Showing 1 to 10 of 50 entries</span>
+      <BootstrapPagination className="mb-0">
+        <BootstrapPagination.Prev />
+        <BootstrapPagination.Item active>{1}</BootstrapPagination.Item>
+        <BootstrapPagination.Item>{2}</BootstrapPagination.Item>
+        <BootstrapPagination.Item>{3}</BootstrapPagination.Item>
+        <BootstrapPagination.Next />
+      </BootstrapPagination>
     </div>
   );
 }
