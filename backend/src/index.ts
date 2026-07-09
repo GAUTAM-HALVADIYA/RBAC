@@ -10,7 +10,6 @@ import userRouter from "./routes/user.route";
 import authRouter from "./routes/auth.route";
 import profileRouter from "./routes/profile.route";
 import moduleRouter from "./routes/module.route";
-import fileRouter from "./routes/file.route";
 import permissionRouter from "./routes/permission.route";
 import auditLogRouter from "./routes/audit-log.route";
 import bcrypt from "bcrypt";
@@ -54,7 +53,6 @@ app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/profile", profileRouter);
 app.use("/api/modules", moduleRouter);
-app.use("/api/files", fileRouter);
 app.use("/api/permissions", permissionRouter);
 app.use("/api/audit-logs", auditLogRouter);
 

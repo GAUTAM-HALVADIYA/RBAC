@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+    const auth = useContext(AuthContext);
 
-	const token = localStorage.getItem("accessToken")
-	let isAuthenticated = true;
-	if(!token)
-		isAuthenticated = false
-    // Add authentication logic here
-    return isAuthenticated ? <>{children}</> : <Navigate to={"/login"} replace />;
+    if (!auth) {
+        return null; // Or a loading spinner
+    }
+
+    return auth.isAuthenticated ? <>{children}</> : <Navigate to={"/login"} replace />;
 }

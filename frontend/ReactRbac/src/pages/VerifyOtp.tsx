@@ -1,11 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function VerifyOtp() {
-    const { verifyOTP, loading, error } = useAuth();
+    const { verifyOTP, handleResendOTP, loading, error } = useAuth();
     const navigate = useNavigate();
     const [otp, setOtp] = useState("");
+    const [resendMsg, setResendMsg] = useState("");
+
+    const email = sessionStorage.getItem("correntVerifyEmail");
+
+    useEffect(() => {
+        if (!email) {
+            navigate("/login", { replace: true });
+        }
+    }, [email, navigate]);
 
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
@@ -34,6 +43,17 @@ export default function VerifyOtp() {
         navigate("/login", { replace: true });
     };
 
+    const handleResend = async () => {
+        const email = sessionStorage.getItem("correntVerifyEmail");
+        if (!email) return;
+
+        setResendMsg("");
+        const res = await handleResendOTP({ email });
+        if (res?.success) {
+            setResendMsg(res.message || "OTP resent successfully");
+        }
+    };
+
     return (
         <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
             <div className="container d-flex justify-content-center">
@@ -56,11 +76,17 @@ export default function VerifyOtp() {
                                 />
                             </div>
 
-                            {error && <span className="text-danger">{error}</span>}
+                            {error && <div className="text-danger mb-3 small text-center">{error}</div>}
+                            {resendMsg && <div className="text-success mb-3 small text-center">{resendMsg}</div>}
 
-                            <button className="btn btn-primary w-100 btn-lg" type="submit" disabled={loading}>
+                            <button className="btn btn-primary w-100 btn-lg mb-3" type="submit" disabled={loading}>
                                 {loading ? "Loading..." : "Verify Code"}
                             </button>
+
+                            <div className="text-center small mt-3">
+                                <span className="text-muted">Didn't receive the code? </span>
+                                <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={handleResend} disabled={loading}>Resend OTP</button>
+                            </div>
                         </form>
                     </div>
                 </div>

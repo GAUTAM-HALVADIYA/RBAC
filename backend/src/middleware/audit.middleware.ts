@@ -11,8 +11,9 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
     const isMutation = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method);
     const isAuth = req.originalUrl.includes("/api/auth");
     const isFileDownload = req.method === "GET" && req.originalUrl.includes("/download");
+    const isGet = req.method === "GET";
 
-    if (isMutation || isAuth || isFileDownload) {
+    if (isMutation || isAuth || isFileDownload || isGet) {
         res.on("finish", async () => {
             const status = res.statusCode >= 200 && res.statusCode < 400 ? "success" : "failure";
             let userId = req.user ? (req.user._id as string) : null;
@@ -30,6 +31,9 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
             if (req.originalUrl.includes("/login")) action = "USER_LOGIN";
             else if (req.originalUrl.includes("/logout")) action = "USER_LOGOUT";
             else if (req.originalUrl.includes("/verify-otp")) action = "OTP_VERIFICATION";
+            else if (req.originalUrl.includes("/profile/avatar")) {
+                action = req.method === "POST" ? "AVATAR_UPLOAD" : req.method === "DELETE" ? "AVATAR_DELETE" : "PROFILE_UPDATE";
+            }
             else if (req.originalUrl.includes("/profile")) action = "PROFILE_UPDATE";
             else if (
                 req.originalUrl.includes("/users") ||

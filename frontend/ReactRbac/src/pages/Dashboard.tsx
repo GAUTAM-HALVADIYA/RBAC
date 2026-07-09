@@ -1,12 +1,26 @@
+import { useState, useEffect } from "react";
 import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 import { Users, Shield, Box } from "lucide-react";
+import { getDashboardStats } from "../services/dashboard.service";
 
 export default function Dashboard() {
+    const [statsData, setStatsData] = useState({ totalUsers: 0, totalRoles: 0, totalModules: 0 });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            const data = await getDashboardStats();
+            setStatsData(data);
+            setLoading(false);
+        };
+        fetchStats();
+    }, []);
+
     const stats = [
-        { label: "Total Users", value: "1,245", icon: <Users size={28} color="var(--primary-color)" /> },
-        { label: "Active Roles", value: "12", icon: <Shield size={28} color="var(--primary-color)" /> },
-        { label: "System Modules", value: "8", icon: <Box size={28} color="var(--primary-color)" /> },
+        { label: "Total Users", value: statsData.totalUsers, icon: <Users size={28} color="var(--primary-color)" /> },
+        { label: "Active Roles", value: statsData.totalRoles, icon: <Shield size={28} color="var(--primary-color)" /> },
+        { label: "System Modules", value: statsData.totalModules, icon: <Box size={28} color="var(--primary-color)" /> },
     ];
 
     return (
@@ -27,9 +41,13 @@ export default function Dashboard() {
                                     <h3 className="text-muted fw-medium mb-1" style={{ fontSize: "15px" }}>
                                         {stat.label}
                                     </h3>
-                                    <p className="fw-bold mb-0 text-dark" style={{ fontSize: "32px", letterSpacing: '-0.5px' }}>
-                                        {stat.value}
-                                    </p>
+                                    {loading ? (
+                                        <div className="spinner-border spinner-border-sm text-primary mt-2" role="status"></div>
+                                    ) : (
+                                        <p className="fw-bold mb-0 text-dark" style={{ fontSize: "32px", letterSpacing: '-0.5px' }}>
+                                            {stat.value.toLocaleString()}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
     const { register, loading, error } = useAuth();
@@ -31,20 +31,37 @@ function Register() {
     return (
         <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
             <div className="container d-flex justify-content-center">
-                <div className="card glass-panel border-0 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
+                <div
+                    className="card glass-panel border-0 shadow-lg"
+                    style={{ width: "100%", maxWidth: "400px" }}
+                >
                     <div className="card-body p-5">
-                        <h2 className="text-center mb-4 fw-bold" style={{ color: "var(--text-main)" }}>
+                        <h2
+                            className="text-center mb-4 fw-bold"
+                            style={{ color: "var(--text-main)" }}
+                        >
                             Create Account
                         </h2>
-                        <p className="text-center text-muted mb-4">Register for a new RBAC account</p>
+                        <p className="text-center text-muted mb-4">
+                            Register for a new RBAC account
+                        </p>
                         <form onSubmit={handleSubmit}>
                             <div className="mb-3">
-                                <label className="form-label fw-medium text-muted small">Name</label>
-                                <input className="form-control" name="name" placeholder="Name" onChange={handleChange} />
+                                <label className="form-label fw-medium text-muted small">
+                                    Name
+                                </label>
+                                <input
+                                    className="form-control"
+                                    name="name"
+                                    placeholder="Name"
+                                    onChange={handleChange}
+                                />
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label fw-medium text-muted small">Email Address</label>
+                                <label className="form-label fw-medium text-muted small">
+                                    Email Address
+                                </label>
                                 <input
                                     type="email"
                                     className="form-control"
@@ -55,7 +72,9 @@ function Register() {
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label fw-medium text-muted small">Password</label>
+                                <label className="form-label fw-medium text-muted small">
+                                    Password
+                                </label>
                                 <input
                                     type="password"
                                     className="form-control"
@@ -65,11 +84,31 @@ function Register() {
                                 />
                             </div>
 
-                            {error && <span className="text-danger">{error}</span>}
+                            {error && (
+                                <div className="text-danger mb-3 small">
+                                    {error}
+                                </div>
+                            )}
 
-                            <button className="btn btn-primary w-100 btn-lg" type="submit" disabled={loading}>
+                            <button
+                                className="btn btn-primary w-100 btn-lg mb-3"
+                                type="submit"
+                                disabled={loading}
+                            >
                                 {loading ? "Loading..." : "Register"}
                             </button>
+
+                            <div className="text-center small mt-3">
+                                <span className="text-muted">
+                                    Already have an account?{" "}
+                                </span>
+                                <Link
+                                    to="/login"
+                                    className="text-decoration-none text-primary fw-medium"
+                                >
+                                    Sign in
+                                </Link>
+                            </div>
                         </form>
                     </div>
                 </div>

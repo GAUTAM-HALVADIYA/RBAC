@@ -1,9 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, LogOut, Bell } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { getProfile } from '../../services/profile.service';
+import type { ProfileResponse } from '../../services/profile.service';
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profile, setProfile] = useState<ProfileResponse['data'] | null>(null);
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const res = await getProfile();
+        setProfile(res.data);
+      } catch (err) {
+        console.error("Failed to fetch user profile in navbar", err);
+      }
+    };
+    fetchUserProfile();
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-custom sticky-top">
@@ -28,11 +51,20 @@ export default function Navbar() {
                 setDropdownOpen(!dropdownOpen);
               }}
             >
-              <span className="d-none d-md-block fs-6 fw-medium text-dark">Admin User</span>
-              <div className="rounded-circle d-flex align-items-center justify-content-center text-white" 
-                   style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, var(--primary-color), var(--primary-hover))', boxShadow: '0 2px 10px rgba(99, 102, 241, 0.3)' }}>
-                <User size={20} />
-              </div>
+              <span className="d-none d-md-block fs-6 fw-medium text-dark">{profile?.user?.name || "Loading..."}</span>
+              {profile?.avatar ? (
+                <img 
+                  src={profile.avatar} 
+                  alt="Avatar" 
+                  className="rounded-circle object-fit-cover shadow-sm" 
+                  style={{ width: '40px', height: '40px' }} 
+                />
+              ) : (
+                <div className="rounded-circle d-flex align-items-center justify-content-center text-white" 
+                     style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, var(--primary-color), var(--primary-hover))', boxShadow: '0 2px 10px rgba(99, 102, 241, 0.3)' }}>
+                  {profile?.user?.name ? profile.user.name.charAt(0).toUpperCase() : <User size={20} />}
+                </div>
+              )}
             </a>
 
             <ul className={`dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 mt-2 ${dropdownOpen ? 'show' : ''}`} style={{ position: 'absolute' }}>
@@ -43,9 +75,13 @@ export default function Navbar() {
               </li>
               <li><hr className="dropdown-divider" /></li>
               <li>
-                <Link to="/login" className="dropdown-item py-2 px-3 text-danger d-flex align-items-center gap-2">
+                <button 
+                  onClick={handleLogout} 
+                  className="dropdown-item py-2 px-3 text-danger d-flex align-items-center gap-2"
+                  style={{ background: 'none', border: 'none', width: '100%', textAlign: 'left' }}
+                >
                   <LogOut size={16} /> Logout
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
