@@ -2,7 +2,6 @@ import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 import Table from "../components/common/Table";
 import Button from "../components/common/Button";
-import { Card } from 'react-bootstrap';
 
 export default function Roles() {
     return (
@@ -11,8 +10,8 @@ export default function Roles() {
                 <Header title="Roles Management" />
                 <Button>+ Create Role</Button>
             </div>
-            <Card className="glass-panel border-0 shadow-sm">
-                <Card.Body className="p-0">
+            <div className="card glass-panel border-0 shadow-sm">
+                <div className="card-body p-0">
                     <Table
                         headers={["Role Name", "Description", "Users Count"]}
                         data={[
@@ -20,8 +19,8 @@ export default function Roles() {
                             { "role name": "Manager", description: "Can manage users and content", "users count": "15" },
                         ]}
                     />
-                </Card.Body>
-            </Card>
+                </div>
+            </div>
         </Layout>
     );
 }

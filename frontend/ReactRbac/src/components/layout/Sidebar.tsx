@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Nav } from 'react-bootstrap';
 import { LayoutDashboard, Users, Shield, Box, Key, FileText } from 'lucide-react';
 
 export default function Sidebar() {
@@ -23,25 +22,24 @@ export default function Sidebar() {
         </div>
         Security OS
       </div>
-      <Nav className="flex-column sidebar-nav gap-2">
+      <div className="nav flex-column sidebar-nav gap-2">
         {links.map((link) => {
           const path = `/${link.name.toLowerCase().replace(' ', '-')}`;
           const isActive = location.pathname === path || (path === '/dashboard' && location.pathname === '/');
           
           return (
-            <Nav.Item key={link.name}>
-              <Nav.Link 
-                as={Link}
+            <div className="nav-item" key={link.name}>
+              <Link 
                 to={path} 
-                className={`nav-link-custom ${isActive ? 'active' : ''}`}
+                className={`nav-link nav-link-custom ${isActive ? 'active' : ''}`}
               >
                 {link.icon}
                 {link.name}
-              </Nav.Link>
-            </Nav.Item>
+              </Link>
+            </div>
           );
         })}
-      </Nav>
+      </div>
     </aside>
   );
 }

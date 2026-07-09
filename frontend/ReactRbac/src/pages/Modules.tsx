@@ -1,16 +1,15 @@
 import Layout from '../components/layout/Layout';
 import Header from '../components/layout/Header';
-import { Card } from 'react-bootstrap';
 
 export default function Modules() {
   return (
     <Layout>
       <Header title="Modules" />
-      <Card className="glass-panel border-0 shadow-sm">
-        <Card.Body className="p-4">
+      <div className="card glass-panel border-0 shadow-sm">
+        <div className="card-body p-4">
           <p className="text-muted mb-0">Module configuration goes here.</p>
-        </Card.Body>
-      </Card>
+        </div>
+      </div>
     </Layout>
   );
 }

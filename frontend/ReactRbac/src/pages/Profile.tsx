@@ -1,13 +1,12 @@
 import Layout from '../components/layout/Layout';
 import Header from '../components/layout/Header';
-import { Card } from 'react-bootstrap';
 
 export default function Profile() {
   return (
     <Layout>
       <Header title="My Profile" />
-      <Card className="glass-panel border-0 shadow-sm" style={{ maxWidth: '600px' }}>
-        <Card.Body className="p-4">
+      <div className="card glass-panel border-0 shadow-sm" style={{ maxWidth: '600px' }}>
+        <div className="card-body p-4">
           <div className="d-flex align-items-center gap-4 mb-4">
             <div 
               className="d-flex align-items-center justify-content-center rounded-circle"
@@ -20,8 +19,8 @@ export default function Profile() {
               <p className="text-muted mb-0">Super Admin</p>
             </div>
           </div>
-        </Card.Body>
-      </Card>
+        </div>
+      </div>
     </Layout>
   );
 }

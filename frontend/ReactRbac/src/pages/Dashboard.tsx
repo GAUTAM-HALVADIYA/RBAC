@@ -1,6 +1,5 @@
 import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
-import { Row, Col, Card } from "react-bootstrap";
 import { Users, Shield, Box } from "lucide-react";
 
 export default function Dashboard() {
@@ -13,11 +12,11 @@ export default function Dashboard() {
     return (
         <Layout>
             <Header title="Dashboard" subtitle="Overview of your system metrics" />
-            <Row className="g-4 mb-4">
+            <div className="row g-4 mb-4">
                 {stats.map((stat) => (
-                    <Col xs={12} md={4} key={stat.label}>
-                        <Card className="glass-panel h-100 border-0 shadow-sm">
-                            <Card.Body className="d-flex align-items-center gap-4 p-4">
+                    <div className="col-12 col-md-4" key={stat.label}>
+                        <div className="card glass-panel h-100 border-0 shadow-sm">
+                            <div className="card-body d-flex align-items-center gap-4 p-4">
                                 <div 
                                     className="rounded-4 d-flex align-items-center justify-content-center" 
                                     style={{ width: '64px', height: '64px', backgroundColor: 'rgba(99, 102, 241, 0.1)' }}
@@ -32,11 +31,11 @@ export default function Dashboard() {
                                         {stat.value}
                                     </p>
                                 </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
+                            </div>
+                        </div>
+                    </div>
                 ))}
-            </Row>
+            </div>
         </Layout>
     );
 }

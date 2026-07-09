@@ -2,7 +2,6 @@ import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 import Table from "../components/common/Table";
 import Pagination from "../components/common/Pagination";
-import { Card } from 'react-bootstrap';
 
 export default function AuditLogs() {
     const dummyData = [
@@ -12,14 +11,14 @@ export default function AuditLogs() {
     return (
         <Layout>
             <Header title="Audit Logs" />
-            <Card className="glass-panel border-0 shadow-sm">
-                <Card.Body className="p-0">
+            <div className="card glass-panel border-0 shadow-sm">
+                <div className="card-body p-0">
                     <Table headers={["Action", "User", "Date", "IP"]} data={dummyData} />
                     <div className="px-4">
                         <Pagination />
                     </div>
-                </Card.Body>
-            </Card>
+                </div>
+            </div>
         </Layout>
     );
 }

@@ -1,31 +1,29 @@
-import { Form, Button, Card, Container } from 'react-bootstrap';
-
 export default function Login() {
   return (
     <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
-      <Container className="d-flex justify-content-center">
-        <Card className="glass-panel border-0 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
-          <Card.Body className="p-5">
+      <div className="container d-flex justify-content-center">
+        <div className="card glass-panel border-0 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
+          <div className="card-body p-5">
             <h2 className="text-center mb-4 fw-bold" style={{ color: 'var(--text-main)' }}>Welcome Back</h2>
             <p className="text-center text-muted mb-4">Please login to your RBAC account</p>
-            <Form>
-              <Form.Group className="mb-4">
-                <Form.Label className="fw-medium text-muted small">Email Address</Form.Label>
-                <Form.Control type="email" placeholder="admin@example.com" size="lg" />
-              </Form.Group>
+            <form>
+              <div className="mb-4">
+                <label className="form-label fw-medium text-muted small">Email Address</label>
+                <input type="email" className="form-control form-control-lg" placeholder="admin@example.com" />
+              </div>
 
-              <Form.Group className="mb-4">
-                <Form.Label className="fw-medium text-muted small">Password</Form.Label>
-                <Form.Control type="password" placeholder="••••••••" size="lg" />
-              </Form.Group>
+              <div className="mb-4">
+                <label className="form-label fw-medium text-muted small">Password</label>
+                <input type="password" className="form-control form-control-lg" placeholder="••••••••" />
+              </div>
 
-              <Button variant="primary" className="w-100 btn-primary" size="lg" type="submit">
+              <button className="btn btn-primary w-100 btn-lg" type="submit">
                 Sign In
-              </Button>
-            </Form>
-          </Card.Body>
-        </Card>
-      </Container>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

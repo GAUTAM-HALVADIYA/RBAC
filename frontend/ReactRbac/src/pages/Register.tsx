@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { Form, Button, Card, Container } from 'react-bootstrap';
 // import { Navigate } from "react-router-dom";
 
 function Register() {
@@ -35,39 +34,39 @@ function Register() {
 
     return (
         <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
-            <Container className="d-flex justify-content-center">
-                <Card className="glass-panel border-0 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
-                    <Card.Body className="p-5">
+            <div className="container d-flex justify-content-center">
+                <div className="card glass-panel border-0 shadow-lg" style={{ width: '100%', maxWidth: '400px' }}>
+                    <div className="card-body p-5">
                         <h2 className="text-center mb-4 fw-bold" style={{ color: 'var(--text-main)' }}>Create Account</h2>
                         <p className="text-center text-muted mb-4">Register for a new RBAC account</p>
-                        <Form onSubmit={handleSubmit}>
-                            <Form.Group className="mb-3">
-                                <Form.Label className="fw-medium text-muted small">Name</Form.Label>
-                                <Form.Control name="name" placeholder="Name" onChange={handleChange} />
-                            </Form.Group>
+                        <form onSubmit={handleSubmit}>
+                            <div className="mb-3">
+                                <label className="form-label fw-medium text-muted small">Name</label>
+                                <input className="form-control" name="name" placeholder="Name" onChange={handleChange} />
+                            </div>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label className="fw-medium text-muted small">Email Address</Form.Label>
-                                <Form.Control type="email" name="email" placeholder="Email" onChange={handleChange} />
-                            </Form.Group>
+                            <div className="mb-3">
+                                <label className="form-label fw-medium text-muted small">Email Address</label>
+                                <input type="email" className="form-control" name="email" placeholder="Email" onChange={handleChange} />
+                            </div>
 
-                            <Form.Group className="mb-3">
-                                <Form.Label className="fw-medium text-muted small">Password</Form.Label>
-                                <Form.Control type="password" name="password" placeholder="Password" onChange={handleChange} />
-                            </Form.Group>
+                            <div className="mb-3">
+                                <label className="form-label fw-medium text-muted small">Password</label>
+                                <input type="password" className="form-control" name="password" placeholder="Password" onChange={handleChange} />
+                            </div>
 
-                            <Form.Group className="mb-4">
-                                <Form.Label className="fw-medium text-muted small">Role ID</Form.Label>
-                                <Form.Control name="role" placeholder="Role Id" onChange={handleChange} />
-                            </Form.Group>
+                            <div className="mb-4">
+                                <label className="form-label fw-medium text-muted small">Role ID</label>
+                                <input className="form-control" name="role" placeholder="Role Id" onChange={handleChange} />
+                            </div>
 
-                            <Button variant="primary" className="w-100 btn-primary" size="lg" type="submit" disabled={loading}>
+                            <button className="btn btn-primary w-100 btn-lg" type="submit" disabled={loading}>
                                 {loading ? "Loading..." : "Register"}
-                            </Button>
-                        </Form>
-                    </Card.Body>
-                </Card>
-            </Container>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

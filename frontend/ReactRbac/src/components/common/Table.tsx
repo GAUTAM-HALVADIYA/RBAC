@@ -1,5 +1,4 @@
 import React from 'react';
-import { Table as BootstrapTable } from 'react-bootstrap';
 
 interface TableProps {
   headers: string[];
@@ -9,7 +8,7 @@ interface TableProps {
 export default function Table({ headers, data }: TableProps) {
   return (
     <div className="table-responsive">
-      <BootstrapTable hover className="table-custom mb-0">
+      <table className="table table-hover table-custom mb-0">
         <thead>
           <tr>
             {headers.map((header, idx) => (
@@ -30,7 +29,7 @@ export default function Table({ headers, data }: TableProps) {
             ))
           )}
         </tbody>
-      </BootstrapTable>
+      </table>
     </div>
   );
 }
