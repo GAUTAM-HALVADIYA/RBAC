@@ -21,7 +21,6 @@ import { AuthContext } from "../context/AuthContext";
 export function useAuth() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const auth = useContext(AuthContext);
 
     const register = async (data: RegisterRequest) => {

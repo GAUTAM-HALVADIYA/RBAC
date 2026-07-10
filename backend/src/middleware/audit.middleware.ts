@@ -11,9 +11,8 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
     const isMutation = ["POST", "PUT", "PATCH", "DELETE"].includes(req.method);
     const isAuth = req.originalUrl.includes("/api/auth");
     const isFileDownload = req.method === "GET" && req.originalUrl.includes("/download");
-    const isGet = req.method === "GET";
 
-    if (isMutation || isAuth || isFileDownload || isGet) {
+    if (isMutation || isAuth || isFileDownload) {
         res.on("finish", async () => {
             const status = res.statusCode >= 200 && res.statusCode < 400 ? "success" : "failure";
             let userId = req.user ? (req.user._id as string) : null;

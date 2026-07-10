@@ -13,6 +13,7 @@ profileRouter.use(authenticate);
 
 profileRouter.post("/", dynamicAuthorize(MODULES.PROFILE, "write"), profile.createProfile);
 profileRouter.get("/", dynamicAuthorize(MODULES.PROFILE, "read"), profile.getProfile);
+profileRouter.get("/detailed", dynamicAuthorize(MODULES.PROFILE, "read"), profile.getCurrentUser);
 profileRouter.patch("/", dynamicAuthorize(MODULES.PROFILE, "write"), validator(updateProfileSchema), profile.updateProfile);
 profileRouter.delete("/", dynamicAuthorize(MODULES.PROFILE, "write"), profile.deleteProfile);
 

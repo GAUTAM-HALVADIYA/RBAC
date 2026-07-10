@@ -54,7 +54,7 @@ export class PermissionService {
 
         if (data.permissions.write) data.permissions.read = true;
 
-        const permission = await permissionModel.findByIdAndUpdate(id, data, { new: true }).populate("moduleId").populate("roleId");
+        const permission = await permissionModel.findByIdAndUpdate(id, data, {returnDocument: "after"}).populate("moduleId").populate("roleId");
         if (!permission) throw new AppError(HTTP_STATUS.NOT_FOUND, "Permission not found");
         return permission;
     }
@@ -65,90 +65,3 @@ export class PermissionService {
         return permission;
     }
 }
-// import permissionModel from "../models/permission.model";
-// import { AppError } from "../utils/AppError";
-// import { HTTP_STATUS } from "../constants/http-status.constants";
-// import {
-//     CreatePermissionDto,
-//     UpdatePermissionDto,
-// } from "../dto/permission.dto";
-
-// export class PermissionService {
-//     async createPermission(data: CreatePermissionDto) {
-//         const permissionExists = await permissionModel.findOne({
-//             key: data.key,
-//         });
-//         if (permissionExists) {
-//             throw new AppError(
-//                 HTTP_STATUS.BAD_REQUEST,
-//                 "Permission with this key already exists",
-//             );
-//         }
-//         return await permissionModel.create(data);
-//     }
-
-//     async getPermissions(
-//         skip: number,
-//         limit: number,
-//         sortBy: string | undefined,
-//         sortOrder: string | undefined,
-//         search?: string | undefined,
-//     ) {
-//         const filter: any = {};
-
-//         if (search) {
-//             filter.$or = [
-//                 {
-//                     name: {
-//                         $regex: search,
-//                         $options: "i",
-//                     },
-//                 },
-
-//                 {
-//                     key: {
-//                         $regex: search,
-//                         $options: "i",
-//                     },
-//                 },
-//             ];
-//         }
-//         const sort: any = {};
-
-//         if (sortBy) {
-//             sort[sortBy] = sortOrder === "desc" ? -1 : 1;
-//         }
-//         return await permissionModel
-//             .find(filter)
-//             .select("name key")
-//             .populate("moduleId", "name key")
-//             .sort(sort)
-//             .skip(skip)
-//             .limit(limit);
-//     }
-
-//     async getPermissionById(id: string) {
-//         const permission = await permissionModel
-//             .findById(id)
-//             .populate("moduleId");
-//         if (!permission)
-//             throw new AppError(HTTP_STATUS.NOT_FOUND, "Permission not found");
-//         return permission;
-//     }
-
-//     async updatePermission(id: string, data: UpdatePermissionDto) {
-//         const permission = await permissionModel
-//             .findByIdAndUpdate(id, data, { new: true })
-//             .populate("moduleId");
-//         if (!permission)
-//             throw new AppError(HTTP_STATUS.NOT_FOUND, "Permission not found");
-//         return permission;
-//     }
-
-//     async deletePermission(id: string) {
-//         const permission = await permissionModel.findByIdAndDelete(id);
-//         if (!permission)
-//             throw new AppError(HTTP_STATUS.NOT_FOUND, "Permission not found");
-//         return permission;
-//     }
-// }

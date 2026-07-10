@@ -4,6 +4,7 @@ import { HTTP_STATUS } from "../constants/http-status.constants";
 import { MESSAGES } from "../constants/messages.constants";
 import { CreateProfileDto, UpdateProfileDto } from "../dto/profile.dto";
 import { cloudinary } from "../middleware/upload.middleware";
+import userModel from "../models/user.model";
 
 export class ProfileService {
     async createProfile(userId: string, data: CreateProfileDto) {
@@ -27,6 +28,14 @@ export class ProfileService {
 
         return profile;
     }
+
+    async getCurrentUser(id: string) {
+            const user = await userModel.findById(id).select("name email").populate("role", "name");
+            if (!user) {
+                throw new AppError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_NOT_FOUND);
+            }
+            return user;
+        }
 
     async updateProfile(userId: string, data: UpdateProfileDto) {
         const { bio, address, dob, avatar } = data;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, LogOut, Bell } from 'lucide-react';
+import { User, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getProfile } from '../../services/profile.service';
@@ -35,12 +35,7 @@ export default function Navbar() {
           RBAC Dashboard
         </a>
         <div className="d-flex align-items-center ms-auto gap-3">
-          <div className="position-relative text-muted" style={{ cursor: 'pointer' }}>
-            <Bell size={20} />
-            <span className="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle">
-              <span className="visually-hidden">New alerts</span>
-            </span>
-          </div>
+          
           
           <div className="dropdown">
             <a 

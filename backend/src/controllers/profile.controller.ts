@@ -29,6 +29,16 @@ export class ProfileController {
         }
     };
 
+    getCurrentUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const userId = req.user!._id.toString();
+            const profile = await profileService.getCurrentUser(userId);
+            res.status(HTTP_STATUS.OK).json({ success: true, data: profile });
+        } catch (error) {
+            next(error);
+        }
+    };
+
     updateProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
             const userId = req.user!._id.toString();
