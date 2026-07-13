@@ -81,13 +81,15 @@ export class UserService {
         return targetUser;
     }
 
-    async deleteUser(targetUserId: string, currentUserRole: string) {
+    async deleteUser(targetUserId: string, currentUserRole: string, currentUser: string) {
         const targetUser = await userModel.findById(targetUserId).populate("role");
 
         if (!targetUser) {
             throw new AppError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_NOT_FOUND);
         }
 
+        if(targetUser._id.toString() == currentUser)
+            throw new AppError(HTTP_STATUS.BAD_REQUEST, "you can't delete loged user");
         const targetUserRole = (targetUser.role as unknown as { name: string }).name;
 
         if (currentUserRole === "Admin" && (targetUserRole === "Admin" || targetUserRole === "Super Admin")) {
