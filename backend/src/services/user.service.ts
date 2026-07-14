@@ -67,17 +67,19 @@ export class UserService {
         }
 
         const targetUserRole = (targetUser.role as unknown as { name: string }).name;
-
+        console.log(targetUserRole, currentUserRole);
         if (currentUserRole === "Admin" && (targetUserRole === "Admin" || targetUserRole === "Super Admin")) {
             throw new AppError(HTTP_STATUS.FORBIDDEN, MESSAGES.ADMIN_NO_MODIFY);
         }
-
         const { name, role } = data;
 
         if (role) {
             const roleExists = await roleModel.findById(role);
             if (!roleExists) {
                 throw new AppError(HTTP_STATUS.BAD_REQUEST, MESSAGES.ROLE_NOT_FOUND);
+            }
+            if (currentUserRole === "Admin" && (roleExists?.name === "Admin" || roleExists?.name === "Super Admin")) {
+                throw new AppError(HTTP_STATUS.FORBIDDEN, MESSAGES.ADMIN_NO_MODIFY);
             }
             targetUser.set("role", role);
         }
@@ -95,8 +97,7 @@ export class UserService {
             throw new AppError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_NOT_FOUND);
         }
 
-        if(targetUser._id.toString() == currentUser)
-            throw new AppError(HTTP_STATUS.BAD_REQUEST, "you can't delete loged user");
+        if (targetUser._id.toString() == currentUser) throw new AppError(HTTP_STATUS.BAD_REQUEST, "you can't delete loged user");
         const targetUserRole = (targetUser.role as unknown as { name: string }).name;
 
         if (currentUserRole === "Admin" && (targetUserRole === "Admin" || targetUserRole === "Super Admin")) {
@@ -111,9 +112,9 @@ export class UserService {
         if (!user) {
             throw new AppError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_NOT_FOUND);
         }
-        
+
         const permissions = await permissionModel.find({ roleId: user.role._id }).populate("moduleId", "name key");
-        
+
         return { ...user.toObject(), permissions };
     }
 
@@ -157,10 +158,9 @@ export class UserService {
         }
 
         try {
-            // Extract public_id from Cloudinary URL if possible
-            const urlParts = user.avatar.split('/');
+            const urlParts = user.avatar.split("/");
             const filenameWithExt = urlParts[urlParts.length - 1];
-            const public_id = filenameWithExt.split('.')[0];
+            const public_id = filenameWithExt.split(".")[0];
             await cloudinary.uploader.destroy(public_id);
         } catch (error) {
             console.error("Cloudinary deletion error:", error);

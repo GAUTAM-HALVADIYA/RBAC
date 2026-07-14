@@ -7,14 +7,7 @@ import type {
     ResetPasswordRequest,
     ResendOtpRequest,
 } from "../types/auth.types";
-import {
-    registerUser,
-    verifyOtp,
-    loginUser,
-    forgotPassword,
-    resetPassword,
-    resendOtp,
-} from "../services/auth.service";
+import { registerUser, verifyOtp, loginUser, forgotPassword, resetPassword, resendOtp } from "../services/auth.service";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContext";
 

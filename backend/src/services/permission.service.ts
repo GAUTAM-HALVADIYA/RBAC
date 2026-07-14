@@ -28,7 +28,7 @@ export class PermissionService {
                 roleModel.find({ name: { $regex: options.search, $options: "i" } }).select('_id'),
                 moduleModel.find({ name: { $regex: options.search, $options: "i" } }).select('_id')
             ]);
-            
+            console.log(matchingRoles, matchingModules);
             filter.$or = [
                 { roleId: { $in: matchingRoles.map(r => r._id) } },
                 { moduleId: { $in: matchingModules.map(m => m._id) } }

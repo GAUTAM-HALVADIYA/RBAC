@@ -9,10 +9,10 @@ import type { Permission } from "../types/permission.types";
 import { DataTable } from "../components/data-table/DataTable";
 import { permissionColumns } from "../features/permissions/permissionColumns";
 
-export default function Permissions() {
+export default function Permissions({ searchBy }: { searchBy: string }) {
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState(searchBy ?? "");
     const [sortBy, setSortBy] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
     const { permissions, loading, error, savePermission, meta } = usePermissions(page, limit, search, sortBy, sortOrder);
@@ -21,7 +21,7 @@ export default function Permissions() {
 
     useEffect(() => {
         setRows(permissions);
-    }, [permissions]);
+    }, [permissions]);  
 
     const handleReadChange = (id: string, checked: boolean) => {
         setRows((prev) =>
@@ -70,27 +70,27 @@ export default function Permissions() {
             <div className="card  border-0 shadow-sm">
                 <div className="card-body">
                     <div className="d-flex justify-content-between mb-3 gap-3">
-                        <input 
-                            type="text" 
-                            className="form-control shadow-none" 
-                            style={{ maxWidth: '300px' }}
-                            placeholder="Search role or module..." 
-                            value={search} 
-                            onChange={(e) => { setSearch(e.target.value); setPage(1); }} 
+                        <input
+                            type="text"
+                            className="form-control shadow-none"
+                            style={{ maxWidth: "300px" }}
+                            placeholder="Search role or module..."
+                            value={search}
+                            disabled={!!searchBy}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setPage(1);
+                            }}
                         />
                         <div className="d-flex gap-2">
-                            <select 
-                                className="form-select shadow-none" 
-                                value={sortBy} 
-                                onChange={(e) => setSortBy(e.target.value)}
-                            >
+                            <select className="form-select shadow-none" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                                 <option value="">Sort By...</option>
                                 <option value="roleId">Role</option>
                                 <option value="moduleId">Module</option>
                             </select>
-                            <select 
-                                className="form-select shadow-none" 
-                                value={sortOrder} 
+                            <select
+                                className="form-select shadow-none"
+                                value={sortOrder}
                                 onChange={(e) => setSortOrder(e.target.value)}
                                 disabled={!sortBy}
                             >
@@ -108,7 +108,11 @@ export default function Permissions() {
                     )}
                 </div>
                 <div className="d-flex justify-content-between p-3 border-top">
-                    <button className="btn btn-sm btn-white border shadow-sm px-3" disabled={page === 1} onClick={() => setPage(page - 1)}>
+                    <button
+                        className="btn btn-sm btn-white border shadow-sm px-3"
+                        disabled={page === 1}
+                        onClick={() => setPage(page - 1)}
+                    >
                         Previous
                     </button>
 
@@ -116,7 +120,11 @@ export default function Permissions() {
                         Page {page} of {meta.totalPages || 1}
                     </span>
 
-                    <button className="btn btn-sm btn-white border shadow-sm px-3" disabled={page >= (meta.totalPages || 1)} onClick={() => setPage(page + 1)}>
+                    <button
+                        className="btn btn-sm btn-white border shadow-sm px-3"
+                        disabled={page >= (meta.totalPages || 1)}
+                        onClick={() => setPage(page + 1)}
+                    >
                         Next
                     </button>
                 </div>

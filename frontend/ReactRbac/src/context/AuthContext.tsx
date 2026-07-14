@@ -2,14 +2,9 @@ import { useState, createContext, useEffect } from "react";
 import type { ReactNode } from "react";
 
 import { getProfile } from "../services/user.service";
+import type { AuthContextType } from "../types/auth.types";
 
-type AuthContextType = {
-    isAuthenticated: boolean;
-    profile: any;
-    login: (token: string, refreshToken?: string) => void;
-    logout: () => void;
-    fetchProfileData: () => Promise<void>;
-};
+
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 

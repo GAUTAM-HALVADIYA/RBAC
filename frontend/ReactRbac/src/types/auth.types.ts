@@ -57,11 +57,9 @@ export interface MeResponse {
 }
 
 export interface AuthContextType {
-    user: User | null;
-    accessToken: string | null;
-    loading: boolean;
-
-    login: (accessToken: string, refreshToken: string) => Promise<void>;
+    isAuthenticated: boolean;
+    profile: any;
+    login: (token: string, refreshToken?: string) => void;
     logout: () => void;
-    setUser: React.Dispatch<React.SetStateAction<User | null>>;
-}
+    fetchProfileData: () => Promise<void>;
+};

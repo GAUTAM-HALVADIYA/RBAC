@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";
 import { useModules } from "../hooks/useModules";
+import Permissions from "./Permissions";
 
 export default function Modules() {
     const { modules, loading, error, meta, page, setPage, fetchModules, handleCreateModule, handleUpdateModule, handleDeleteModule } =
@@ -32,7 +33,7 @@ export default function Modules() {
         setShowModal(true);
     };
 
-    const onSubmit = async (e: React.FormEvent) => {
+    const onSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         setActionError("");
 
@@ -103,7 +104,7 @@ export default function Modules() {
                                             </td>
                                             <td className="align-middle">
                                                 <span
-                                                    className={`badge ${mod.isActive ? "bg-success" : "bg-danger"}  ${mod.isActive ? "text-success border-success" : "text-danger border-danger"} px-3 py-2 rounded-pill shadow-sm border border-opacity-25`}
+                                                    className={`badge ${mod.isActive ? "bg-success-subtle text-success border-success" : "bg-danger-subtle text-danger border-danger"} px-3 py-2 rounded-pill shadow-sm border border-opacity-25`}
                                                 >
                                                     {mod.isActive ? "Active" : "Inactive"}
                                                 </span>
@@ -113,7 +114,7 @@ export default function Modules() {
                                                     className="btn btn-sm btn-light text-primary me-2 shadow-sm"
                                                     onClick={() => handleEditClick(mod)}
                                                 >
-                                                    <i className="bi bi-pencil-square"></i> Edit
+                                                    <i className="bi bi-pencil-square"></i> Edit 
                                                 </button>
                                                 <button
                                                     className="btn btn-sm btn-light text-danger shadow-sm"
@@ -212,6 +213,8 @@ export default function Modules() {
                                         </label>
                                     </div>
                                 </div>
+                                
+                                <Permissions searchBy ={formData.name as string}/>
                                 <div className="modal-footer bg-light  border-top-0 pt-3 pb-4 px-4">
                                     <button
                                         type="button"

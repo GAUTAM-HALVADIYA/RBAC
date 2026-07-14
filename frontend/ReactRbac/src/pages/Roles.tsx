@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";
 import { useRoles } from "../hooks/useRoles";
+import Permissions from "./Permissions";
 
 export default function Roles() {
     const {
@@ -226,6 +227,7 @@ export default function Roles() {
                                         />
                                     </div>
                                 </div>
+                                <Permissions searchBy ={formData.name as string}/>
                                 <div className="modal-footer bg-light  border-top-0 pt-3 pb-4 px-4">
                                     <button
                                         type="button"
