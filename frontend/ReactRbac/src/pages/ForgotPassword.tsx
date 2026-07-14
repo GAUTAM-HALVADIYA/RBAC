@@ -26,9 +26,9 @@ export default function ForgotPassword() {
     return (
         <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
             <div className="container d-flex justify-content-center">
-                <div className="card glass-panel border-0 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
+                <div className="card  border-0 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
                     <div className="card-body p-5">
-                        <h2 className="text-center mb-4 fw-bold" style={{ color: "var(--text-main)" }}>
+                        <h2 className="text-center mb-4 fw-bold" style={{ color: "#212529" }}>
                             Forgot Password
                         </h2>
                         <p className="text-center text-muted mb-4">Enter your email to receive an OTP</p>

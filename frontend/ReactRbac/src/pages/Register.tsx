@@ -32,13 +32,13 @@ function Register() {
         <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
             <div className="container d-flex justify-content-center">
                 <div
-                    className="card glass-panel border-0 shadow-lg"
+                    className="card  border-0 shadow-lg"
                     style={{ width: "100%", maxWidth: "400px" }}
                 >
                     <div className="card-body p-5">
                         <h2
                             className="text-center mb-4 fw-bold"
-                            style={{ color: "var(--text-main)" }}
+                            style={{ color: "#212529" }}
                         >
                             Create Account
                         </h2>

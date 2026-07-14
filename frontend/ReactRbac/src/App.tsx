@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Layout from "./components/layout/Layout";
 
 function App() {
     return (
@@ -26,70 +27,16 @@ function App() {
                 <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
                 <Route path="/reset-password" element={<GuestRoute><ResetPassword /></GuestRoute>} />
 
-                <Route
-                    path="/"
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/users"
-                    element={
-                        <ProtectedRoute>
-                            <Users />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/roles"
-                    element={
-                        <ProtectedRoute>
-                            <Roles />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/modules"
-                    element={
-                        <ProtectedRoute>
-                            <Modules />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/permissions"
-                    element={
-                        <ProtectedRoute>
-                            <Permissions />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/audit-logs"
-                    element={
-                        <ProtectedRoute>
-                            <AuditLogs />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/profile"
-                    element={
-                        <ProtectedRoute>
-                            <Profile />
-                        </ProtectedRoute>
-                    }
-                />
+                <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/users" element={<Users />} />
+                    <Route path="/roles" element={<Roles />} />
+                    <Route path="/modules" element={<Modules />} />
+                    <Route path="/permissions" element={<Permissions />} />
+                    <Route path="/audit-logs" element={<AuditLogs />} />
+                    <Route path="/profile" element={<Profile />} />
+                </Route>
 
                 <Route path="*" element={<NotFound />} />
             </Routes>

@@ -2,16 +2,11 @@ import api from "../api";
 
 export const getDashboardStats = async () => {
     try {
-        const [usersRes, rolesRes, modulesRes] = await Promise.all([
-            api.get("/users?limit=1"),
-            api.get("/roles?limit=1"),
-            api.get("/modules?limit=1")
-        ]);
-
+        const response = await api.get("/dashboard/stats");
         return {
-            totalUsers: usersRes.data?.meta?.totalRecords || 0,
-            totalRoles: rolesRes.data?.meta?.totalRecords || 0,
-            totalModules: modulesRes.data?.meta?.totalRecords || 0
+            totalUsers: response.data?.data?.totalUsers || 0,
+            totalRoles: response.data?.data?.totalRoles || 0,
+            totalModules: response.data?.data?.totalModules || 0,
         };
     } catch (error) {
         console.error("Failed to fetch dashboard stats", error);

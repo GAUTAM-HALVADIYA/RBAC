@@ -151,5 +151,7 @@ export function useAuth() {
         handleResetPassword,
         handleResendOTP,
         isAuthenticated: auth?.isAuthenticated || false,
+        profile: auth?.profile,
+        fetchProfileData: auth?.fetchProfileData,
     };
 }

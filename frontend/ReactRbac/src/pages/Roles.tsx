@@ -1,11 +1,20 @@
 import { useState, useEffect } from "react";
-import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 import { useRoles } from "../hooks/useRoles";
 
 export default function Roles() {
-    const { roles, loading, error, meta, page, setPage, fetchRoles, handleCreateRole, handleUpdateRole, handleDeleteRole } =
-        useRoles();
+    const {
+        roles,
+        loading,
+        error,
+        meta,
+        page,
+        setPage,
+        fetchRoles,
+        handleCreateRole,
+        handleUpdateRole,
+        handleDeleteRole,
+    } = useRoles();
 
     const [showModal, setShowModal] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
@@ -47,12 +56,15 @@ export default function Roles() {
         if (res.success) {
             setShowModal(false);
         } else {
-            setActionError(res.error || (isEditing ? "Update failed" : "Creation failed"));
+            setActionError(
+                res.error || (isEditing ? "Update failed" : "Creation failed"),
+            );
         }
     };
 
     const onDeleteClick = async (id: string) => {
-        if (!window.confirm("Are you sure you want to delete this role?")) return;
+        if (!window.confirm("Are you sure you want to delete this role?"))
+            return;
         const res = await handleDeleteRole(id);
         if (!res.success) {
             alert(res.error || "Delete failed");
@@ -60,17 +72,20 @@ export default function Roles() {
     };
 
     return (
-        <Layout>
+        <>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <Header title="Roles Management" />
-                <button className="btn btn-primary shadow-sm" onClick={handleCreateClick}>
+                <button
+                    className="btn btn-primary shadow-sm"
+                    onClick={handleCreateClick}
+                >
                     + Create Role
                 </button>
             </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="card glass-panel border-0 shadow-sm">
+            <div className="card  border-0 shadow-sm">
                 <div className="card-body p-0">
                     <div className="table-responsive">
                         <table className="table table-hover table-custom mb-0">
@@ -83,13 +98,22 @@ export default function Roles() {
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={2} className="text-center py-4">
-                                            <div className="spinner-border text-primary" role="status"></div>
+                                        <td
+                                            colSpan={2}
+                                            className="text-center py-4"
+                                        >
+                                            <div
+                                                className="spinner-border text-primary"
+                                                role="status"
+                                            ></div>
                                         </td>
                                     </tr>
                                 ) : roles.length === 0 ? (
                                     <tr>
-                                        <td colSpan={2} className="text-center text-muted py-4">
+                                        <td
+                                            colSpan={2}
+                                            className="text-center text-muted py-4"
+                                        >
                                             No roles available
                                         </td>
                                     </tr>
@@ -97,22 +121,28 @@ export default function Roles() {
                                     roles.map((role) => (
                                         <tr key={role._id}>
                                             <td className="align-middle fw-medium">
-                                                <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill shadow-sm border border-primary border-opacity-25">
+                                                <span className="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
                                                     {role.name}
                                                 </span>
                                             </td>
                                             <td className="align-middle text-end px-4">
                                                 <button
                                                     className="btn btn-sm btn-light text-primary me-2 shadow-sm"
-                                                    onClick={() => handleEditClick(role)}
+                                                    onClick={() =>
+                                                        handleEditClick(role)
+                                                    }
                                                 >
-                                                    <i className="bi bi-pencil-square"></i> Edit
+                                                    <i className="bi bi-pencil-square"></i>{" "}
+                                                    Edit
                                                 </button>
                                                 <button
                                                     className="btn btn-sm btn-light text-danger shadow-sm"
-                                                    onClick={() => onDeleteClick(role._id)}
+                                                    onClick={() =>
+                                                        onDeleteClick(role._id)
+                                                    }
                                                 >
-                                                    <i className="bi bi-trash-fill"></i> Delete
+                                                    <i className="bi bi-trash-fill"></i>{" "}
+                                                    Delete
                                                 </button>
                                             </td>
                                         </tr>
@@ -123,21 +153,22 @@ export default function Roles() {
                     </div>
 
                     {meta && meta.totalPages > 1 && (
-                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light bg-opacity-50">
+                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light ">
                             <span className="text-muted small fw-medium">
-                                Showing page {meta.currentPage} of {meta.totalPages}
+                                Showing page {meta.currentPage} of{" "}
+                                {meta.totalPages}
                             </span>
                             <div className="d-flex gap-2">
                                 <button
                                     className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={!meta.hasPrevPage}
+                                    disabled={page === 1}
                                     onClick={() => setPage(page - 1)}
                                 >
                                     Previous
                                 </button>
                                 <button
                                     className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={!meta.hasNextPage}
+                                    disabled={page >= meta.totalPages}
                                     onClick={() => setPage(page + 1)}
                                 >
                                     Next
@@ -152,17 +183,30 @@ export default function Roles() {
                 <div
                     className="modal d-block"
                     tabIndex={-1}
-                    style={{ backgroundColor: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
+                    style={{
+                        backgroundColor: "rgba(0,0,0,0.4)",
+                        backdropFilter: "blur(4px)",
+                    }}
                 >
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                            <div className="modal-header bg-light bg-opacity-50 border-bottom-0 pb-3 pt-4 px-4">
-                                <h5 className="modal-title fw-bold text-dark fs-5">{isEditing ? "Edit Role" : "Create Role"}</h5>
-                                <button type="button" className="btn-close shadow-none" onClick={() => setShowModal(false)}></button>
+                            <div className="modal-header bg-light  border-bottom-0 pb-3 pt-4 px-4">
+                                <h5 className="modal-title fw-bold text-dark fs-5">
+                                    {isEditing ? "Edit Role" : "Create Role"}
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn-close shadow-none"
+                                    onClick={() => setShowModal(false)}
+                                ></button>
                             </div>
                             <form onSubmit={onSubmit}>
                                 <div className="modal-body px-4">
-                                    {actionError && <div className="alert alert-danger py-2 small rounded-3">{actionError}</div>}
+                                    {actionError && (
+                                        <div className="alert alert-danger py-2 small rounded-3">
+                                            {actionError}
+                                        </div>
+                                    )}
                                     <div className="mb-4">
                                         <label className="form-label text-muted small fw-medium text-uppercase tracking-wide">
                                             Role Name
@@ -171,13 +215,18 @@ export default function Roles() {
                                             type="text"
                                             className="form-control form-control-lg shadow-none fs-6"
                                             value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            onChange={(e) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    name: e.target.value,
+                                                })
+                                            }
                                             required
                                             placeholder="e.g. Editor"
                                         />
                                     </div>
                                 </div>
-                                <div className="modal-footer bg-light bg-opacity-50 border-top-0 pt-3 pb-4 px-4">
+                                <div className="modal-footer bg-light  border-top-0 pt-3 pb-4 px-4">
                                     <button
                                         type="button"
                                         className="btn btn-light px-4 py-2 text-muted fw-medium border shadow-sm"
@@ -185,8 +234,13 @@ export default function Roles() {
                                     >
                                         Cancel
                                     </button>
-                                    <button type="submit" className="btn btn-primary px-4 py-2 fw-medium shadow-sm">
-                                        {isEditing ? "Save Changes" : "Create Role"}
+                                    <button
+                                        type="submit"
+                                        className="btn btn-primary px-4 py-2 fw-medium shadow-sm"
+                                    >
+                                        {isEditing
+                                            ? "Save Changes"
+                                            : "Create Role"}
                                     </button>
                                 </div>
                             </form>
@@ -194,6 +248,6 @@ export default function Roles() {
                     </div>
                 </div>
             )}
-        </Layout>
+        </>
     );
 }

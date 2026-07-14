@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 import { useUsers } from "../hooks/useUsers";
 import { getRoles } from "../services/role.service";
@@ -56,14 +55,14 @@ export default function Users() {
     };
 
     return (
-        <Layout>
+        <>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <Header title="Users Management" />
             </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="card glass-panel border-0 shadow-sm">
+            <div className="card  border-0 shadow-sm">
                 <div className="card-body p-0">
                     <div className="table-responsive">
                         <table className="table table-hover table-custom mb-0">
@@ -94,7 +93,7 @@ export default function Users() {
                                             <td className="align-middle fw-medium">{user.name}</td>
                                             <td className="align-middle text-muted">{user.email}</td>
                                             <td className="align-middle">
-                                                <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill shadow-sm border border-primary border-opacity-25">
+                                                <span className="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
                                                     {user.role?.name || "No Role"}
                                                 </span>
                                             </td>
@@ -120,21 +119,21 @@ export default function Users() {
                     </div>
 
                     {meta && meta.totalPages > 1 && (
-                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light bg-opacity-50">
+                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light ">
                             <span className="text-muted small fw-medium">
                                 Showing page {meta.currentPage} of {meta.totalPages}
                             </span>
                             <div className="d-flex gap-2">
                                 <button
                                     className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={!meta.hasPrevPage}
+                                    disabled={page === 1}
                                     onClick={() => setPage(page - 1)}
                                 >
                                     Previous
                                 </button>
                                 <button
                                     className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={!meta.hasNextPage}
+                                    disabled={page >= meta.totalPages}
                                     onClick={() => setPage(page + 1)}
                                 >
                                     Next
@@ -153,7 +152,7 @@ export default function Users() {
                 >
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                            <div className="modal-header bg-light bg-opacity-50 border-bottom-0 pb-3 pt-4 px-4">
+                            <div className="modal-header bg-light  border-bottom-0 pb-3 pt-4 px-4">
                                 <h5 className="modal-title fw-bold text-dark fs-5">Edit User</h5>
                                 <button
                                     type="button"
@@ -197,7 +196,7 @@ export default function Users() {
                                         </select>
                                     </div>
                                 </div>
-                                <div className="modal-footer bg-light bg-opacity-50 border-top-0 pt-3 pb-4 px-4">
+                                <div className="modal-footer bg-light  border-top-0 pt-3 pb-4 px-4">
                                     <button
                                         type="button"
                                         className="btn btn-light px-4 py-2 text-muted fw-medium border shadow-sm"
@@ -214,6 +213,6 @@ export default function Users() {
                     </div>
                 </div>
             )}
-        </Layout>
+        </>
     );
 }

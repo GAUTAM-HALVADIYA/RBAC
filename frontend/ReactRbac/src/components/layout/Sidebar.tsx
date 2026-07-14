@@ -1,15 +1,17 @@
-import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, Shield, Box, Key, FileText } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function Sidebar() {
+    const { profile } = useAuth();
+    const permissions = profile?.permissions;
+
     const links = [
-        { name: "Dashboard", icon: <LayoutDashboard size={18} /> },
-        { name: "Users", icon: <Users size={18} /> },
-        { name: "Roles", icon: <Shield size={18} /> },
-        { name: "Modules", icon: <Box size={18} /> },
-        { name: "Permissions", icon: <Key size={18} /> },
-        { name: "Audit Logs", icon: <FileText size={18} /> },
+        { name: "Dashboard", key: "dashboard", path: "/" },
+        { name: "Users", key: "users", path: "/users" },
+        { name: "Roles", key: "roles", path: "/roles" },
+        { name: "Modules", key: "modules", path: "/modules" },
+        { name: "Permissions", key: "permissions", path: "/permissions" },
+        { name: "Audit Logs", key: "audit-log", path: "/audit-logs" },
     ];
 
     const location = useLocation();
@@ -17,30 +19,20 @@ export default function Sidebar() {
     return (
         <aside className="sidebar">
             <div className="sidebar-brand">
-                <div
-                    style={{
-                        width: "32px",
-                        height: "32px",
-                        borderRadius: "8px",
-                        background: "linear-gradient(135deg, var(--primary-color), var(--primary-hover))",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Shield color="white" size={20} />
-                </div>
-                RBAC
+                RBAC System
             </div>
-            <div className="nav flex-column sidebar-nav gap-2">
-                {links.map((link) => {
-                    const path = `/${link.name.toLowerCase().replace(" ", "-")}`;
-                    const isActive = location.pathname === path || (path === "/dashboard" && location.pathname === "/");
+            <div className="sidebar-nav">
+                {links.filter(link => {
+                    if (link.name === "Dashboard") return true;
+                    if (!permissions) return false;
+                    const perm = permissions.find((p: any) => p.moduleId?.key === link.key);
+                    return perm?.permissions?.read === true;
+                }).map((link) => {
+                    const isActive = location.pathname === link.path || (link.path === "/" && location.pathname === "/dashboard");
 
                     return (
                         <div className="nav-item" key={link.name}>
-                            <Link to={path} className={`nav-link nav-link-custom ${isActive ? "active" : ""}`}>
-                                {link.icon}
+                            <Link to={link.path === "/" ? "/dashboard" : link.path} className={`nav-link-custom ${isActive ? "active" : ""}`}>
                                 {link.name}
                             </Link>
                         </div>

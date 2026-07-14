@@ -37,7 +37,5 @@ export const getPaginatedMetadata = (
     totalRecords,
     totalPages,
     currentPage: page,
-    hasNextPage: page < totalPages,
-    hasPrevPage: page > 1,
   };
 };

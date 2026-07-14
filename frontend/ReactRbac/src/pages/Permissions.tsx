@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 
 import { usePermissions } from "../hooks/usePermission";
+import { useAuth } from "../hooks/useAuth";
 
 import type { Permission } from "../types/permission.types";
 import { DataTable } from "../components/data-table/DataTable";
@@ -12,7 +12,11 @@ import { permissionColumns } from "../features/permissions/permissionColumns";
 export default function Permissions() {
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
-    const { permissions, loading, error, savePermission, meta } = usePermissions(page, limit);
+    const [search, setSearch] = useState("");
+    const [sortBy, setSortBy] = useState("");
+    const [sortOrder, setSortOrder] = useState("asc");
+    const { permissions, loading, error, savePermission, meta } = usePermissions(page, limit, search, sortBy, sortOrder);
+    const { fetchProfileData } = useAuth();
     const [rows, setRows] = useState<Permission[]>([]);
 
     useEffect(() => {
@@ -53,16 +57,48 @@ export default function Permissions() {
 
     const handleSave = async (permission: Permission) => {
         await savePermission(permission._id, permission.permissions.read, permission.permissions.write);
-
+        if (fetchProfileData) {
+            await fetchProfileData();
+        }
         alert("Permission Updated");
     };
 
     return (
-        <Layout>
+        <>
             <Header title="Permissions" />
 
-            <div className="card glass-panel border-0 shadow-sm">
+            <div className="card  border-0 shadow-sm">
                 <div className="card-body">
+                    <div className="d-flex justify-content-between mb-3 gap-3">
+                        <input 
+                            type="text" 
+                            className="form-control shadow-none" 
+                            style={{ maxWidth: '300px' }}
+                            placeholder="Search role or module..." 
+                            value={search} 
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }} 
+                        />
+                        <div className="d-flex gap-2">
+                            <select 
+                                className="form-select shadow-none" 
+                                value={sortBy} 
+                                onChange={(e) => setSortBy(e.target.value)}
+                            >
+                                <option value="">Sort By...</option>
+                                <option value="roleId">Role</option>
+                                <option value="moduleId">Module</option>
+                            </select>
+                            <select 
+                                className="form-select shadow-none" 
+                                value={sortOrder} 
+                                onChange={(e) => setSortOrder(e.target.value)}
+                                disabled={!sortBy}
+                            >
+                                <option value="asc">Ascending</option>
+                                <option value="desc">Descending</option>
+                            </select>
+                        </div>
+                    </div>
                     {error && <div className="alert alert-danger">{error}</div>}
 
                     {loading ? (
@@ -71,20 +107,20 @@ export default function Permissions() {
                         <DataTable data={rows} columns={permissionColumns(handleReadChange, handleWriteChange, handleSave)} />
                     )}
                 </div>
-                <div className="d-flex justify-content-between">
-                    <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+                <div className="d-flex justify-content-between p-3 border-top">
+                    <button className="btn btn-sm btn-white border shadow-sm px-3" disabled={page === 1} onClick={() => setPage(page - 1)}>
                         Previous
                     </button>
 
-                    <span>
-                        {page} / {meta.totalPages}
+                    <span className="text-muted small fw-medium mt-1">
+                        Page {page} of {meta.totalPages || 1}
                     </span>
 
-                    <button disabled={page === meta.totalPages} onClick={() => setPage(page + 1)}>
+                    <button className="btn btn-sm btn-white border shadow-sm px-3" disabled={page >= (meta.totalPages || 1)} onClick={() => setPage(page + 1)}>
                         Next
                     </button>
                 </div>
             </div>
-        </Layout>
+        </>
     );
 }

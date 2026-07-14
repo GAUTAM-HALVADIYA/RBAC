@@ -35,6 +35,22 @@ const userSchema = new Schema({
         type: String,
         default: null,
     },
+
+    bio: {
+        type: String,
+    },
+
+    address: {
+        type: String,
+    },
+
+    dob: {
+        type: Date,
+    },
+
+    avatar: {
+        type: String,
+    },
 });
 
 const userModel = model("User", userSchema);

@@ -1,7 +1,6 @@
 import userModel from "../models/user.model";
 import roleModel from "../models/role.model";
 import otpModel from "../models/otp.model";
-import profileModel from "../models/profile.model";
 import bcrypt from "bcrypt";
 import { generateOtp } from "../utils/otp.util";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/token.util";
@@ -34,8 +33,6 @@ export class AuthService {
             role,
             isVerified: false,
         });
-
-        await profileModel.create({ user: newUser._id });
 
         await otpModel.updateMany({ user: newUser._id }, { isUsed: true });
 

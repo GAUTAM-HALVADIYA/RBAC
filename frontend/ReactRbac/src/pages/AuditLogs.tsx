@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 import { useAuditLogs } from "../hooks/useAuditLogs";
 
@@ -11,12 +10,12 @@ export default function AuditLogs() {
     }, [fetchLogs]);
 
     return (
-        <Layout>
+        <>
             <Header title="Audit Logs" />
             
             {error && <div className="alert alert-danger">{error}</div>}
             
-            <div className="card glass-panel border-0 shadow-sm">
+            <div className="card  border-0 shadow-sm">
                 <div className="card-body p-0">
                     <div className="table-responsive">
                         <table className="table table-hover table-custom mb-0">
@@ -54,7 +53,7 @@ export default function AuditLogs() {
                                                 {log.ipAddress || '-'}
                                             </td>
                                             <td className="align-middle">
-                                                <span className={`badge ${log.status === 'success' ? 'bg-success' : 'bg-danger'} bg-opacity-10 ${log.status === 'success' ? 'text-success border-success' : 'text-danger border-danger'} px-3 py-1 rounded-pill shadow-sm border border-opacity-25`}>
+                                                <span className={`badge ${log.status === 'success' ? 'bg-success' : 'bg-danger'}  ${log.status === 'success' ? 'text-success border-success' : 'text-danger border-danger'} px-3 py-1 rounded-pill shadow-sm border border-opacity-25`}>
                                                     {log.status === 'success' ? 'Success' : 'Failure'}
                                                 </span>
                                             </td>
@@ -76,19 +75,19 @@ export default function AuditLogs() {
                     </div>
                     
                     {meta && meta.totalPages > 1 && (
-                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light bg-opacity-50">
+                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light ">
                             <span className="text-muted small fw-medium">Showing page {meta.currentPage} of {meta.totalPages}</span>
                             <div className="d-flex gap-2">
                                 <button 
                                     className="btn btn-sm btn-white border shadow-sm px-3" 
-                                    disabled={!meta.hasPrevPage}
+                                    disabled={page === 1}
                                     onClick={() => setPage(page - 1)}
                                 >
                                     Previous
                                 </button>
                                 <button 
                                     className="btn btn-sm btn-white border shadow-sm px-3" 
-                                    disabled={!meta.hasNextPage}
+                                    disabled={page >= meta.totalPages}
                                     onClick={() => setPage(page + 1)}
                                 >
                                     Next
@@ -98,6 +97,6 @@ export default function AuditLogs() {
                     )}
                 </div>
             </div>
-        </Layout>
+        </>
     );
 }

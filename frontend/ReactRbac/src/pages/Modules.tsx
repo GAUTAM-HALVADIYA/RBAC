@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 import { useModules } from "../hooks/useModules";
 
@@ -60,7 +59,7 @@ export default function Modules() {
     };
 
     return (
-        <Layout>
+        <>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <Header title="Modules Management" />
                 <button className="btn btn-primary shadow-sm" onClick={handleCreateClick}>
@@ -70,7 +69,7 @@ export default function Modules() {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="card glass-panel border-0 shadow-sm">
+            <div className="card  border-0 shadow-sm">
                 <div className="card-body p-0">
                     <div className="table-responsive">
                         <table className="table table-hover table-custom mb-0">
@@ -104,7 +103,7 @@ export default function Modules() {
                                             </td>
                                             <td className="align-middle">
                                                 <span
-                                                    className={`badge ${mod.isActive ? "bg-success" : "bg-danger"} bg-opacity-10 ${mod.isActive ? "text-success border-success" : "text-danger border-danger"} px-3 py-2 rounded-pill shadow-sm border border-opacity-25`}
+                                                    className={`badge ${mod.isActive ? "bg-success" : "bg-danger"}  ${mod.isActive ? "text-success border-success" : "text-danger border-danger"} px-3 py-2 rounded-pill shadow-sm border border-opacity-25`}
                                                 >
                                                     {mod.isActive ? "Active" : "Inactive"}
                                                 </span>
@@ -131,21 +130,21 @@ export default function Modules() {
                     </div>
 
                     {meta && meta.totalPages > 1 && (
-                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light bg-opacity-50">
+                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light ">
                             <span className="text-muted small fw-medium">
                                 Showing page {meta.currentPage} of {meta.totalPages}
                             </span>
                             <div className="d-flex gap-2">
                                 <button
                                     className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={!meta.hasPrevPage}
+                                    disabled={page === 1}
                                     onClick={() => setPage(page - 1)}
                                 >
                                     Previous
                                 </button>
                                 <button
                                     className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={!meta.hasNextPage}
+                                    disabled={page >= meta.totalPages}
                                     onClick={() => setPage(page + 1)}
                                 >
                                     Next
@@ -164,7 +163,7 @@ export default function Modules() {
                 >
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                            <div className="modal-header bg-light bg-opacity-50 border-bottom-0 pb-3 pt-4 px-4">
+                            <div className="modal-header bg-light  border-bottom-0 pb-3 pt-4 px-4">
                                 <h5 className="modal-title fw-bold text-dark fs-5">{isEditing ? "Edit Module" : "Create Module"}</h5>
                                 <button type="button" className="btn-close shadow-none" onClick={() => setShowModal(false)}></button>
                             </div>
@@ -213,7 +212,7 @@ export default function Modules() {
                                         </label>
                                     </div>
                                 </div>
-                                <div className="modal-footer bg-light bg-opacity-50 border-top-0 pt-3 pb-4 px-4">
+                                <div className="modal-footer bg-light  border-top-0 pt-3 pb-4 px-4">
                                     <button
                                         type="button"
                                         className="btn btn-light px-4 py-2 text-muted fw-medium border shadow-sm"
@@ -230,6 +229,6 @@ export default function Modules() {
                     </div>
                 </div>
             )}
-        </Layout>
+        </>
     );
 }

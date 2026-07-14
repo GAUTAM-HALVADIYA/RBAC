@@ -5,7 +5,7 @@ import { getPermissions, updatePermission } from "../services/permission.service
 
 import type { PermissionResponse } from "../types/permission.types";
 
-export function usePermissions(page: number, limit: number) {
+export function usePermissions(page: number, limit: number, search?: string, sortBy?: string, sortOrder?: string) {
     const [permissions, setPermissions] = useState<PermissionResponse>({
         data: [],
         meta: { page: 0, limit: 0, totalRecords: 0, totalPages: 0 },
@@ -13,12 +13,12 @@ export function usePermissions(page: number, limit: number) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const fetchPermissions = async (page: number, limit: number) => {
+    const fetchPermissions = async (p: number, l: number, s?: string, sb?: string, so?: string) => {
         try {
             setLoading(true);
             setError("");
 
-            const response = await getPermissions(page, limit);
+            const response = await getPermissions(p, l, s, sb, so);
 
             setPermissions(response);
         } catch (err) {
@@ -53,8 +53,8 @@ export function usePermissions(page: number, limit: number) {
     };
 
     useEffect(() => {
-        fetchPermissions(page, limit);
-    }, [page, limit]);
+        fetchPermissions(page, limit, search, sortBy, sortOrder);
+    }, [page, limit, search, sortBy, sortOrder]);
 
     return {
         permissions: permissions.data,

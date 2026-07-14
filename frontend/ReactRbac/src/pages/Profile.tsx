@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import Layout from "../components/layout/Layout";
 import Header from "../components/layout/Header";
 import { useProfile } from "../hooks/useProfile";
 
@@ -8,29 +7,27 @@ export default function Profile() {
         profile,
         loading,
         error: fetchError,
-        fetchProfile,
         handleUpdateProfile,
         handleUploadAvatar,
         handleDeleteAvatar,
     } = useProfile();
     const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({ bio: "", address: "", dob: "" });
+    const [formData, setFormData] = useState({ name: "", bio: "", address: "", dob: "" });
     const [actionError, setActionError] = useState("");
     const [successMsg, setSuccessMsg] = useState("");
     const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        fetchProfile().then((data) => {
-            if (data) {
-                setFormData({
-                    bio: data.bio || "",
-                    address: data.address || "",
-                    dob: data.dob ? new Date(data.dob).toISOString().split("T")[0] : "",
-                });
-            }
-        });
-    }, [fetchProfile]);
+        if (profile) {
+            setFormData({
+                name: profile.name || "",
+                bio: profile.bio || "",
+                address: profile.address || "",
+                dob: profile.dob ? new Date(profile.dob).toISOString().split("T")[0] : "",
+            });
+        }
+    }, [profile]);
 
     const onUpdateSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,19 +68,19 @@ export default function Profile() {
 
     if (loading) {
         return (
-            <Layout>
+            <>
                 <Header title="My Profile" />
                 <div className="p-4 d-flex justify-content-center">
                     <div className="spinner-border text-primary" role="status"></div>
                 </div>
-            </Layout>
+            </>
         );
     }
 
     return (
-        <Layout>
+        <>
             <Header title="My Profile" />
-            <div className="card glass-panel border-0 shadow-sm" style={{ maxWidth: "600px" }}>
+            <div className="card  border-0 shadow-sm" style={{ maxWidth: "600px" }}>
                 <div className="card-body p-4">
                     {fetchError && <div className="alert alert-danger py-2">{fetchError}</div>}
                     {actionError && <div className="alert alert-danger py-2">{actionError}</div>}
@@ -104,13 +101,13 @@ export default function Profile() {
                                     style={{
                                         width: "96px",
                                         height: "96px",
-                                        background: "linear-gradient(135deg, var(--primary-color), var(--primary-hover))",
+                                        background: "#0d6efd",
                                         color: "white",
                                         fontSize: "2rem",
                                         fontWeight: "bold",
                                     }}
                                 >
-                                    {profile?.user?.name?.charAt(0).toUpperCase()}
+                                    {profile?.name?.charAt(0).toUpperCase()}
                                 </div>
                             )}
 
@@ -140,10 +137,10 @@ export default function Profile() {
                         </div>
 
                         <div>
-                            <h2 className="fw-bold mb-1" style={{ color: "var(--text-main)" }}>
-                                {profile?.user?.name}
+                            <h2 className="fw-bold mb-1" style={{ color: "#212529" }}>
+                                {profile?.name}
                             </h2>
-                            <p className="text-muted mb-0">{profile?.user?.email}</p>
+                            <p className="text-muted mb-0">{profile?.email}</p>
                         </div>
                     </div>
 
@@ -151,6 +148,16 @@ export default function Profile() {
 
                     {isEditing ? (
                         <form onSubmit={onUpdateSubmit}>
+                            <div className="mb-3">
+                                <label className="form-label text-muted small fw-medium">Name</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    required
+                                />
+                            </div>
                             <div className="mb-3">
                                 <label className="form-label text-muted small fw-medium">Bio</label>
                                 <textarea
@@ -218,6 +225,6 @@ export default function Profile() {
                     )}
                 </div>
             </div>
-        </Layout>
+        </>
     );
 }

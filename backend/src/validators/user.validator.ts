@@ -14,6 +14,12 @@ export const updateUserSchema = z.object({
     name: z.string().min(3).optional(),
 
     role: z.string().length(24).optional(),
+
+    bio: z.string().max(500, "Bio can't exceed 500 characters").optional(),
+    
+    address: z.string().optional(),
+    
+    dob: z.coerce.date().optional(),
 });
 
 export const userIdSchema = z.object({

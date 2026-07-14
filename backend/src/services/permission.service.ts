@@ -3,6 +3,8 @@ import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/http-status.constants";
 import { CreatePermissionDto, UpdatePermissionDto } from "../dto/permission.dto";
 import { PaginationOptions, getPaginatedMetadata, getPaginationOptions } from "../utils/pagination.util";
+import roleModel from "../models/role.model";
+import moduleModel from "../models/module.model";
 
 export class PermissionService {
     async createPermission(data: CreatePermissionDto) {
@@ -20,6 +22,18 @@ export class PermissionService {
         const options = getPaginationOptions(query);
         const filter: any = {};
         const sort: any = {};
+
+        if (options.search) {
+            const [matchingRoles, matchingModules] = await Promise.all([
+                roleModel.find({ name: { $regex: options.search, $options: "i" } }).select('_id'),
+                moduleModel.find({ name: { $regex: options.search, $options: "i" } }).select('_id')
+            ]);
+            
+            filter.$or = [
+                { roleId: { $in: matchingRoles.map(r => r._id) } },
+                { moduleId: { $in: matchingModules.map(m => m._id) } }
+            ];
+        }
 
         if (options.sortBy) {
             sort[options.sortBy] = options.sortOrder === "desc" ? -1 : 1;

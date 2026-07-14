@@ -8,7 +8,11 @@ import userModel from "../models/user.model";
 import permissionModel from "../models/permission.model";
 import { CreatePermissionDto } from "../dto/permission.dto";
 import { PermissionService } from "./permission.service";
-import { PaginationOptions, getPaginatedMetadata, getPaginationOptions } from "../utils/pagination.util";
+import {
+    PaginationOptions,
+    getPaginatedMetadata,
+    getPaginationOptions,
+} from "../utils/pagination.util";
 
 const permissionService = new PermissionService();
 
@@ -53,9 +57,19 @@ export class RoleService {
 
         const [totalRecords, data] = await Promise.all([
             roleModel.countDocuments(filter),
-            roleModel.find(filter).select("name").sort(sort).skip(options.skip).limit(options.limit).lean(),
+            roleModel
+                .find(filter)
+                .select("name")
+                .sort(sort)
+                .skip(options.skip)
+                .limit(options.limit)
+                .lean(),
         ]);
-        const meta = getPaginatedMetadata(totalRecords, options.page, options.limit);
+        const meta = getPaginatedMetadata(
+            totalRecords,
+            options.page,
+            options.limit,
+        );
 
         return { data, meta };
     }
@@ -79,7 +93,10 @@ export class RoleService {
     async deleteRole(id: string) {
         const usersWithRole = await userModel.countDocuments({ role: id });
         if (usersWithRole > 0) {
-            throw new AppError(HTTP_STATUS.BAD_REQUEST, "Cannot delete role because it is assigned to existing users");
+            throw new AppError(
+                HTTP_STATUS.BAD_REQUEST,
+                "Cannot delete role because it is assigned to existing users",
+            );
         }
 
         const role = await roleModel.findByIdAndDelete(id);

@@ -5,6 +5,5 @@ export const MODULES = {
     USERS: "users",
     FILES: "files",
     AUDIT_LOGS: "audit-logs",
-    PROFILE: "profile",
     AUTH: "auth"
 };
