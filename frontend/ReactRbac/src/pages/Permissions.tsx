@@ -9,17 +9,25 @@ import type { Permission } from "../types/permission.types";
 import { DataTable } from "../components/data-table/DataTable";
 import { permissionColumns } from "../features/permissions/permissionColumns";
 
-export default function Permissions({ searchBy, isEmbedded }: { searchBy?: string; isEmbedded?: boolean }) {
+export default function Permissions({
+    searchBy,
+    isEmbedded,
+}: {
+    searchBy?: string;
+    isEmbedded?: boolean;
+}) {
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
     const [search, setSearch] = useState(searchBy ?? "");
     const [sortBy, setSortBy] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
-    const { permissions, loading, error, savePermission, meta } = usePermissions(page, limit, search, sortBy, sortOrder);
+    const { permissions, loading, error, savePermission, meta } =
+        usePermissions(page, limit, search, sortBy, sortOrder);
     const { fetchProfileData } = useAuth();
     const [rows, setRows] = useState<Permission[]>([]);
-    // const indexPages: number = 3;
-    const [numberInc, setNumberInc] = useState({ inc: 0, itrate: false });
+    const [numberInc, setNumberInc] = useState(0);
+    const nuOfPage = 3;
+    const mid: number = Math.floor(nuOfPage / 2);
 
     useEffect(() => {
         setRows(permissions);
@@ -58,7 +66,11 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
     };
 
     const handleSave = async (permission: Permission) => {
-        await savePermission(permission._id, permission.permissions.read, permission.permissions.write);
+        await savePermission(
+            permission._id,
+            permission.permissions.read,
+            permission.permissions.write,
+        );
         if (fetchProfileData) {
             await fetchProfileData();
         }
@@ -86,7 +98,11 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
                                 }}
                             />
                             <div className="d-flex gap-2">
-                                <select className="form-select shadow-none" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                                <select
+                                    className="form-select shadow-none"
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                >
                                     <option value="">Sort By...</option>
                                     <option value="roleId">Role</option>
                                     <option value="moduleId">Module</option>
@@ -94,7 +110,9 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
                                 <select
                                     className="form-select shadow-none"
                                     value={sortOrder}
-                                    onChange={(e) => setSortOrder(e.target.value)}
+                                    onChange={(e) =>
+                                        setSortOrder(e.target.value)
+                                    }
                                     disabled={!sortBy}
                                 >
                                     <option value="asc">Ascending</option>
@@ -108,42 +126,82 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
                     {loading ? (
                         <p>Loading...</p>
                     ) : (
-                        <DataTable data={rows} columns={permissionColumns(handleReadChange, handleWriteChange, handleSave)} />
+                        <DataTable
+                            data={rows}
+                            columns={permissionColumns(
+                                handleReadChange,
+                                handleWriteChange,
+                                handleSave,
+                            )}
+                        />
                     )}
                 </div>
                 <div className="d-flex justify-content-between p-3 border-top pagination">
-                    <button className="page-item page-link" disabled={page === 1} onClick={() => setPage(page - 1)}>
+                    <button
+                        className="page-item page-link"
+                        disabled={page === 1}
+                        onClick={() => setPage(page - 1)}
+                    >
                         Previous
                     </button>
                     {/* meta.totalPages - page >= indexPages */}
                     <nav aria-label="Page navigation example">
                         <ul className="pagination justify-content-end">
                             {/* Previous Button */}
-                            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                                <a className="page-link" href="#" tabIndex={page === 1 ? -1 : 0} onClick={() => setPage(page - 1)}>
+                            <li
+                                className={`page-item ${page === 1 ? "disabled" : ""}`}
+                            >
+                                <a
+                                    className="page-link"
+                                    href="#"
+                                    tabIndex={page === 1 ? -1 : 0}
+                                    onClick={() => {
+                                        if (
+                                            mid <= page &&
+                                            page - mid > 1 &&
+                                            page <= meta.totalPages - mid
+                                        )
+                                            setNumberInc((prev) => prev - 1);
+                                        setPage(page - 1);
+                                    }}
+                                >
                                     Previous
                                 </a>
                             </li>
 
                             {/* Page Numbers */}
-                            {Array.from({ length: meta.totalPages }, (_, index) => {
-                                const pageNum = index + 1;
+                            {Array.from({ length: nuOfPage }, (_, index) => {
+                                const pageNum = index + 1 + numberInc;
                                 return (
-                                    <li className={`page-item ${page === pageNum ? "active" : ""}`} key={pageNum}>
+                                    <li
+                                        className={`page-item ${page === pageNum ? "active" : ""}`}
+                                        key={pageNum}
+                                    >
                                         <a className="page-link" href="#">
-                                            {pageNum + numberInc.inc}
+                                            {pageNum}
                                         </a>
                                     </li>
                                 );
                             })}
 
                             {/* Next Button */}
-                            <li className={`page-item ${page >= (meta.totalPages || 1) ? "disabled" : ""}`}>
+                            <li
+                                className={`page-item ${page >= (meta.totalPages || 1) ? "disabled" : ""}`}
+                            >
                                 <a
                                     className="page-link"
                                     href="#"
-                                    tabIndex={page >= (meta.totalPages || 1) ? -1 : 0}
-                                    onClick={() => setPage(page + 1)}
+                                    tabIndex={
+                                        page >= (meta.totalPages || 1) ? -1 : 0
+                                    }
+                                    onClick={() => {
+                                        if (
+                                            mid < page &&
+                                            page + mid < meta.totalPages
+                                        )
+                                            setNumberInc((prev) => prev + 1);
+                                        setPage(page + 1);
+                                    }}
                                 >
                                     Next
                                 </a>
@@ -158,13 +216,7 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
                     <button
                         className="page-item page-link"
                         disabled={page >= (meta.totalPages || 1)}
-                        onClick={() =>
-                            setNumberInc((prevState) => ({
-                                ...prevState,
-                                inc: prevState.inc + 1,
-                                itrate: page + 2 == meta.totalPages,
-                            }))
-                        }
+                        onClick={() => setPage(page + 1)}
                     >
                         Next
                     </button>
