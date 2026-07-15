@@ -226,8 +226,13 @@ export default function Roles() {
                                             placeholder="e.g. Editor"
                                         />
                                     </div>
+                                    {isEditing && (
+                                        <div className="mt-4 border-top pt-4">
+                                            <h6 className="fw-bold text-dark mb-3">Role Permissions</h6>
+                                            <Permissions searchBy={formData.name as string} isEmbedded={true} />
+                                        </div>
+                                    )}
                                 </div>
-                                <Permissions searchBy ={formData.name as string}/>
                                 <div className="modal-footer bg-light  border-top-0 pt-3 pb-4 px-4">
                                     <button
                                         type="button"

@@ -9,7 +9,7 @@ import type { Permission } from "../types/permission.types";
 import { DataTable } from "../components/data-table/DataTable";
 import { permissionColumns } from "../features/permissions/permissionColumns";
 
-export default function Permissions({ searchBy }: { searchBy: string }) {
+export default function Permissions({ searchBy, isEmbedded }: { searchBy?: string; isEmbedded?: boolean }) {
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
     const [search, setSearch] = useState(searchBy ?? "");
@@ -65,40 +65,42 @@ export default function Permissions({ searchBy }: { searchBy: string }) {
 
     return (
         <>
-            <Header title="Permissions" />
+            {!isEmbedded && <Header title="Permissions" />}
 
-            <div className="card  border-0 shadow-sm">
-                <div className="card-body">
-                    <div className="d-flex justify-content-between mb-3 gap-3">
-                        <input
-                            type="text"
-                            className="form-control shadow-none"
-                            style={{ maxWidth: "300px" }}
-                            placeholder="Search role or module..."
-                            value={search}
-                            disabled={!!searchBy}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
-                                setPage(1);
-                            }}
-                        />
-                        <div className="d-flex gap-2">
-                            <select className="form-select shadow-none" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
-                                <option value="">Sort By...</option>
-                                <option value="roleId">Role</option>
-                                <option value="moduleId">Module</option>
-                            </select>
-                            <select
-                                className="form-select shadow-none"
-                                value={sortOrder}
-                                onChange={(e) => setSortOrder(e.target.value)}
-                                disabled={!sortBy}
-                            >
-                                <option value="asc">Ascending</option>
-                                <option value="desc">Descending</option>
-                            </select>
+            <div className={`card border-0 ${isEmbedded ? '' : 'shadow-sm'}`}>
+                <div className={`card-body ${isEmbedded ? 'p-0' : ''}`}>
+                    {!isEmbedded && (
+                        <div className="d-flex justify-content-between mb-3 gap-3">
+                            <input
+                                type="text"
+                                className="form-control shadow-none"
+                                style={{ maxWidth: "300px" }}
+                                placeholder="Search role or module..."
+                                value={search}
+                                disabled={!!searchBy}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setPage(1);
+                                }}
+                            />
+                            <div className="d-flex gap-2">
+                                <select className="form-select shadow-none" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                                    <option value="">Sort By...</option>
+                                    <option value="roleId">Role</option>
+                                    <option value="moduleId">Module</option>
+                                </select>
+                                <select
+                                    className="form-select shadow-none"
+                                    value={sortOrder}
+                                    onChange={(e) => setSortOrder(e.target.value)}
+                                    disabled={!sortBy}
+                                >
+                                    <option value="asc">Ascending</option>
+                                    <option value="desc">Descending</option>
+                                </select>
+                            </div>
                         </div>
-                    </div>
+                    )}
                     {error && <div className="alert alert-danger">{error}</div>}
 
                     {loading ? (
