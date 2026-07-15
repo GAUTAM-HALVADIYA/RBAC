@@ -18,7 +18,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (!isAuthenticated) return;
         try {
             const res = await getProfile();
-            console.log("getProfile response:", res);
             setProfile(res.data);
         } catch (err) {
             console.error("Failed to fetch user profile in context", err);

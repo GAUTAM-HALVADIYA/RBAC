@@ -18,10 +18,12 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
     const { permissions, loading, error, savePermission, meta } = usePermissions(page, limit, search, sortBy, sortOrder);
     const { fetchProfileData } = useAuth();
     const [rows, setRows] = useState<Permission[]>([]);
+    // const indexPages: number = 3;
+    const [numberInc, setNumberInc] = useState({ inc: 0, itrate: false });
 
     useEffect(() => {
         setRows(permissions);
-    }, [permissions]);  
+    }, [permissions]);
 
     const handleReadChange = (id: string, checked: boolean) => {
         setRows((prev) =>
@@ -67,8 +69,8 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
         <>
             {!isEmbedded && <Header title="Permissions" />}
 
-            <div className={`card border-0 ${isEmbedded ? '' : 'shadow-sm'}`}>
-                <div className={`card-body ${isEmbedded ? 'p-0' : ''}`}>
+            <div className={`card border-0 ${isEmbedded ? "" : "shadow-sm"}`}>
+                <div className={`card-body ${isEmbedded ? "p-0" : ""}`}>
                     {!isEmbedded && (
                         <div className="d-flex justify-content-between mb-3 gap-3">
                             <input
@@ -109,23 +111,60 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
                         <DataTable data={rows} columns={permissionColumns(handleReadChange, handleWriteChange, handleSave)} />
                     )}
                 </div>
-                <div className="d-flex justify-content-between p-3 border-top">
-                    <button
-                        className="btn btn-sm btn-white border shadow-sm px-3"
-                        disabled={page === 1}
-                        onClick={() => setPage(page - 1)}
-                    >
+                <div className="d-flex justify-content-between p-3 border-top pagination">
+                    <button className="page-item page-link" disabled={page === 1} onClick={() => setPage(page - 1)}>
                         Previous
                     </button>
+                    {/* meta.totalPages - page >= indexPages */}
+                    <nav aria-label="Page navigation example">
+                        <ul className="pagination justify-content-end">
+                            {/* Previous Button */}
+                            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                                <a className="page-link" href="#" tabIndex={page === 1 ? -1 : 0} onClick={() => setPage(page - 1)}>
+                                    Previous
+                                </a>
+                            </li>
+
+                            {/* Page Numbers */}
+                            {Array.from({ length: meta.totalPages }, (_, index) => {
+                                const pageNum = index + 1;
+                                return (
+                                    <li className={`page-item ${page === pageNum ? "active" : ""}`} key={pageNum}>
+                                        <a className="page-link" href="#">
+                                            {pageNum + numberInc.inc}
+                                        </a>
+                                    </li>
+                                );
+                            })}
+
+                            {/* Next Button */}
+                            <li className={`page-item ${page >= (meta.totalPages || 1) ? "disabled" : ""}`}>
+                                <a
+                                    className="page-link"
+                                    href="#"
+                                    tabIndex={page >= (meta.totalPages || 1) ? -1 : 0}
+                                    onClick={() => setPage(page + 1)}
+                                >
+                                    Next
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
 
                     <span className="text-muted small fw-medium mt-1">
                         Page {page} of {meta.totalPages || 1}
                     </span>
 
                     <button
-                        className="btn btn-sm btn-white border shadow-sm px-3"
+                        className="page-item page-link"
                         disabled={page >= (meta.totalPages || 1)}
-                        onClick={() => setPage(page + 1)}
+                        onClick={() =>
+                            setNumberInc((prevState) => ({
+                                ...prevState,
+                                inc: prevState.inc + 1,
+                                itrate: page + 2 == meta.totalPages,
+                            }))
+                        }
                     >
                         Next
                     </button>

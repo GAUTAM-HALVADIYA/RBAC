@@ -113,7 +113,7 @@ export class UserService {
             throw new AppError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_NOT_FOUND);
         }
 
-        const permissions = await permissionModel.find({ roleId: user.role._id }).populate("moduleId", "name key");
+        const permissions = await permissionModel.find({ roleId: user.role._id }).populate("moduleId", "name key isActive");
 
         return { ...user.toObject(), permissions };
     }
