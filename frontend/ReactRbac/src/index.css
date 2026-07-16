@@ -42,7 +42,8 @@ body {
     display: block;
 }
 
-.sidebar-nav .nav-link-custom:hover, .sidebar-nav .nav-link-custom.active {
+.sidebar-nav .nav-link-custom:hover,
+.sidebar-nav .nav-link-custom.active {
     background-color: #4f5962;
     color: white;
 }

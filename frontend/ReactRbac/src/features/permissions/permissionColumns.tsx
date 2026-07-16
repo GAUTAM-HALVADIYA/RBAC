@@ -1,4 +1,4 @@
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "../../components/data-table/DataTable";
 import type { Permission } from "../../types/permission.types";
 
 export function permissionColumns(

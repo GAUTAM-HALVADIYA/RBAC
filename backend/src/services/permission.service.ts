@@ -23,6 +23,14 @@ export class PermissionService {
         const filter: any = {};
         const sort: any = {};
 
+        if (query.roleId) {
+            filter.roleId = query.roleId;
+        }
+
+        if (query.moduleId) {
+            filter.moduleId = query.moduleId;
+        }
+
         if (options.search) {
             const [matchingRoles, matchingModules] = await Promise.all([
                 roleModel.find({ name: { $regex: options.search, $options: "i" } }).select('_id'),

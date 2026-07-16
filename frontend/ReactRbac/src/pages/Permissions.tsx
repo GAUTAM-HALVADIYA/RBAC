@@ -10,13 +10,13 @@ import { DataTable } from "../components/data-table/DataTable";
 import { permissionColumns } from "../features/permissions/permissionColumns";
 import { Pagination } from "../components/data-table/Pagination";
 
-export default function Permissions({ searchBy, isEmbedded }: { searchBy?: string; isEmbedded?: boolean }) {
+export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?: string; moduleId?: string; isEmbedded?: boolean }) {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
-    const [search, setSearch] = useState(searchBy ?? "");
+    const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState("");
     const [sortOrder, setSortOrder] = useState("asc");
-    const { permissions, loading, error, savePermission, meta } = usePermissions(page, limit, search, sortBy, sortOrder);
+    const { permissions, loading, error, savePermission, meta } = usePermissions(page, limit, search, sortBy, sortOrder, roleId, moduleId);
     const { fetchProfileData } = useAuth();
     const [rows, setRows] = useState<Permission[]>([]);
 
@@ -72,18 +72,17 @@ export default function Permissions({ searchBy, isEmbedded }: { searchBy?: strin
                 <div className={`card-body ${isEmbedded ? "p-0" : ""}`}>
                     {!isEmbedded && (
                         <div className="d-flex justify-content-between mb-3 gap-3">
-                            <input
-                                type="text"
-                                className="form-control shadow-none"
-                                style={{ maxWidth: "300px" }}
-                                placeholder="Search role or module..."
-                                value={search}
-                                disabled={!!searchBy}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setPage(1);
-                                }}
-                            />
+                                <input
+                                    type="text"
+                                    className="form-control shadow-none"
+                                    style={{ maxWidth: "300px" }}
+                                    placeholder="Search role or module..."
+                                    value={search}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setPage(1);
+                                    }}
+                                />
                             <div className="d-flex gap-2">
                                 <select className="form-select shadow-none" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                                     <option value="">Sort By...</option>

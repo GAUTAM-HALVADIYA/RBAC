@@ -229,7 +229,7 @@ export default function Roles() {
                                     {isEditing && (
                                         <div className="mt-4 border-top pt-4">
                                             <h6 className="fw-bold text-dark mb-3">Role Permissions</h6>
-                                            <Permissions searchBy={formData.name as string} isEmbedded={true} />
+                                            <Permissions roleId={editingRole?._id} isEmbedded={true} />
                                         </div>
                                     )}
                                 </div>
