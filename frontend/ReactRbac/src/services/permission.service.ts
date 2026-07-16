@@ -7,6 +7,11 @@ export const getPermissions = async (page: number, limit: number, search?: strin
     if (sortBy) url += `&sortBy=${sortBy}`;
     if (sortOrder) url += `&sortOrder=${sortOrder}`;
     const response = await api.get<PermissionResponse>(url);
+    // const response = await api.get<PermissionResponse>("/permisisons", {
+    //     params: {
+    //         page, limit, search, sortBy, sortOrder
+    //     }
+    // });
     return response.data;
 };
 

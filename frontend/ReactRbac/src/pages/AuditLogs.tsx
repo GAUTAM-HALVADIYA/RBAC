@@ -1,17 +1,9 @@
-import { useEffect, useState } from "react";
 import Header from "../components/layout/Header";
 import { useAuditLogs } from "../hooks/useAuditLogs";
+import { Pagination } from "../components/data-table/Pagination";
 
 export default function AuditLogs() {
-    const { logs, loading, error, meta, page, setPage, fetchLogs } =
-        useAuditLogs();
-    const [numberInc, setNumberInc] = useState(0);
-    const [iterate, setIterate] = useState(false);
-    const nuOfPage = 3;
-    const mid: number = Math.floor(nuOfPage / 2);
-    useEffect(() => {
-        fetchLogs();
-    }, [fetchLogs]);
+    const { logs, loading, error, meta, page, setPage } = useAuditLogs();
 
     return (
         <>
@@ -35,22 +27,13 @@ export default function AuditLogs() {
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td
-                                            colSpan={5}
-                                            className="text-center py-4"
-                                        >
-                                            <div
-                                                className="spinner-border text-primary"
-                                                role="status"
-                                            ></div>
+                                        <td colSpan={5} className="text-center py-4">
+                                            <div className="spinner-border text-primary" role="status"></div>
                                         </td>
                                     </tr>
                                 ) : logs.length === 0 ? (
                                     <tr>
-                                        <td
-                                            colSpan={5}
-                                            className="text-center text-muted py-4"
-                                        >
+                                        <td colSpan={5} className="text-center text-muted py-4">
                                             No audit logs found
                                         </td>
                                     </tr>
@@ -58,43 +41,29 @@ export default function AuditLogs() {
                                     logs.map((log) => (
                                         <tr key={log._id}>
                                             <td className="align-middle fw-medium">
-                                                <code className="bg-light px-2 py-1 rounded border text-dark">
-                                                    {log.action}
-                                                </code>
+                                                <code className="bg-light px-2 py-1 rounded border text-dark">{log.action}</code>
                                             </td>
                                             <td className="align-middle text-muted">
                                                 {log.userId ? (
                                                     <div>
-                                                        <div className="fw-medium text-dark">
-                                                            {log.userId.name}
-                                                        </div>
-                                                        <div className="small">
-                                                            {log.userId.email}
-                                                        </div>
+                                                        <div className="fw-medium text-dark">{log.userId.name}</div>
+                                                        <div className="small">{log.userId.email}</div>
                                                     </div>
                                                 ) : (
-                                                    <span className="fst-italic">
-                                                        System Activity
-                                                    </span>
+                                                    <span className="fst-italic">System Activity</span>
                                                 )}
                                             </td>
-                                            <td className="align-middle text-muted font-monospace">
-                                                {log.ipAddress || "-"}
-                                            </td>
+                                            <td className="align-middle text-muted font-monospace">{log.ipAddress || "-"}</td>
                                             <td className="align-middle">
                                                 <span
                                                     className={`badge ${log.status === "success" ? "bg-success-subtle text-success border-success" : "bg-danger-subtle text-danger border-danger"} px-3 py-1 rounded-pill shadow-sm border border-opacity-25`}
                                                 >
-                                                    {log.status === "success"
-                                                        ? "Success"
-                                                        : "Failure"}
+                                                    {log.status === "success" ? "Success" : "Failure"}
                                                 </span>
                                             </td>
 
                                             <td className="align-middle text-muted small">
-                                                {new Date(
-                                                    log.timestamp,
-                                                ).toLocaleString(undefined, {
+                                                {new Date(log.timestamp).toLocaleString(undefined, {
                                                     year: "numeric",
                                                     month: "short",
                                                     day: "numeric",
@@ -110,110 +79,7 @@ export default function AuditLogs() {
                         </table>
                     </div>
 
-                    {meta && meta.totalPages > 1 && (
-                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light ">
-                            <span className="text-muted small fw-medium">
-                                Showing page {meta.currentPage} of{" "}
-                                {meta.totalPages}
-                            </span>
-                            <div className="d-flex gap-2">
-                                <button
-                                    className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={page === 1}
-                                    onClick={() => setPage(page - 1)}
-                                >
-                                    Previous
-                                </button>
-                                <nav aria-label="Page navigation example">
-                                    <ul className="pagination justify-content-end">
-                                        {/* Previous Button */}
-                                        <li
-                                            className={`page-item ${page === 1 ? "disabled" : ""}`}
-                                        >
-                                            <a
-                                                className="page-link"
-                                                href="#"
-                                                tabIndex={page === 1 ? -1 : 0}
-                                                onClick={() => {
-                                                    if (
-                                                        mid <= page &&
-                                                        page - mid > 1 &&
-                                                        page <=
-                                                            meta.totalPages -
-                                                                mid
-                                                    )
-                                                        setNumberInc(
-                                                            (prev) => prev - 1,
-                                                        );
-                                                    setPage(page - 1);
-                                                }}
-                                            >
-                                                Previous
-                                            </a>
-                                        </li>
-
-                                        {/* Page Numbers */}
-                                        {Array.from(
-                                            { length: nuOfPage },
-                                            (_, index) => {
-                                                const pageNum =
-                                                    index + 1 + numberInc;
-                                                return (
-                                                    <li
-                                                        className={`page-item ${page === pageNum ? "active" : ""}`}
-                                                        key={pageNum}
-                                                    >
-                                                        <a
-                                                            className="page-link"
-                                                            href="#"
-                                                        >
-                                                            {pageNum}
-                                                        </a>
-                                                    </li>
-                                                );
-                                            },
-                                        )}
-
-                                        {/* Next Button */}
-                                        <li
-                                            className={`page-item ${page >= (meta.totalPages || 1) ? "disabled" : ""}`}
-                                        >
-                                            <a
-                                                className="page-link"
-                                                href="#"
-                                                tabIndex={
-                                                    page >=
-                                                    (meta.totalPages || 1)
-                                                        ? -1
-                                                        : 0
-                                                }
-                                                onClick={() => {
-                                                    if (
-                                                        mid < page &&
-                                                        page + mid <
-                                                            meta.totalPages
-                                                    )
-                                                        setNumberInc(
-                                                            (prev) => prev + 1,
-                                                        );
-                                                    setPage(page + 1);
-                                                }}
-                                            >
-                                                Next
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </nav>
-                                <button
-                                    className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={page >= meta.totalPages}
-                                    onClick={() => setPage(page + 1)}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        </div>
-                    )}
+                    <Pagination onPageChange={setPage} page={page} totalPages={meta.totalPages} totalRecords={meta.totalRecords}/>
                 </div>
             </div>
         </>
