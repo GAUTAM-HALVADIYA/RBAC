@@ -57,6 +57,7 @@ export function Pagination(props: PaginationProps) {
         onPageChange(page + 1);
     };
 
+
     return (
         <div className="d-flex justify-content-between align-items-center p-3 border-top">
             {props.showInfo && (

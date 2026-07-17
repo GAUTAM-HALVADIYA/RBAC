@@ -77,3 +77,16 @@ body {
 .table-custom {
     width: 100%;
 }
+.table-custom th {
+    position: relative;
+}
+
+.resize-handle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    cursor: col-resize;
+    user-select: none;
+}
+

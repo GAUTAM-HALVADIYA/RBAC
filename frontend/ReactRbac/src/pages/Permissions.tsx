@@ -9,14 +9,29 @@ import type { Permission } from "../types/permission.types";
 import { DataTable } from "../components/data-table/DataTable";
 import { permissionColumns } from "../features/permissions/permissionColumns";
 import { Pagination } from "../components/data-table/Pagination";
+import type { SortingState } from "../components/data-table/types";
 
 export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?: string; moduleId?: string; isEmbedded?: boolean }) {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [search, setSearch] = useState("");
-    const [sortBy, setSortBy] = useState("");
-    const [sortOrder, setSortOrder] = useState("asc");
-    const { permissions, loading, error, savePermission, meta } = usePermissions(page, limit, search, sortBy, sortOrder, roleId, moduleId);
+    // const [sortBy, setSortBy] = useState("");
+    // const [sortOrder, setSortOrder] = useState("asc");
+    const [sorting, setSorting] = useState<SortingState>({
+        column: null,
+        direction: null,
+    });
+    const { permissions, loading, error, savePermission, meta } = usePermissions(
+        page,
+        limit,
+        search,
+        // sortBy,
+        // sortOrder,
+        sorting.column ?? "",
+        sorting.direction ?? "",
+        roleId,
+        moduleId,
+    );
     const { fetchProfileData } = useAuth();
     const [rows, setRows] = useState<Permission[]>([]);
 
@@ -72,18 +87,18 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
                 <div className={`card-body ${isEmbedded ? "p-0" : ""}`}>
                     {!isEmbedded && (
                         <div className="d-flex justify-content-between mb-3 gap-3">
-                                <input
-                                    type="text"
-                                    className="form-control shadow-none"
-                                    style={{ maxWidth: "300px" }}
-                                    placeholder="Search role or module..."
-                                    value={search}
-                                    onChange={(e) => {
-                                        setSearch(e.target.value);
-                                        setPage(1);
-                                    }}
-                                />
-                            <div className="d-flex gap-2">
+                            <input
+                                type="text"
+                                className="form-control shadow-none"
+                                style={{ maxWidth: "300px" }}
+                                placeholder="Search role or module..."
+                                value={search}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setPage(1);
+                                }}
+                            />
+                            {/* <div className="d-flex gap-2">
                                 <select className="form-select shadow-none" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                                     <option value="">Sort By...</option>
                                     <option value="roleId">Role</option>
@@ -98,7 +113,7 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
                                     <option value="asc">Ascending</option>
                                     <option value="desc">Descending</option>
                                 </select>
-                            </div>
+                            </div> */}
                         </div>
                     )}
                     {error && <div className="alert alert-danger">{error}</div>}
@@ -106,7 +121,13 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
                     {loading ? (
                         <p>Loading...</p>
                     ) : (
-                        <DataTable data={rows} columns={permissionColumns(handleReadChange, handleWriteChange, handleSave)} />
+                        <DataTable
+                            data={rows}
+                            columns={permissionColumns(handleReadChange, handleWriteChange, handleSave)}
+                            maxHeight="600px"
+                            sorting={sorting}
+                            onSortingChange={setSorting}
+                        />
                     )}
                 </div>
 

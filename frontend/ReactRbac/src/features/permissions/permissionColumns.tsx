@@ -1,4 +1,4 @@
-import type { ColumnDef } from "../../components/data-table/DataTable";
+import type { ColumnDef } from "../../components/data-table/types";
 import type { Permission } from "../../types/permission.types";
 
 export function permissionColumns(
@@ -11,12 +11,18 @@ export function permissionColumns(
             accessorFn: (row) => row.roleId.name,
             id: "role",
             header: "Role",
+            enableSorting: true,
+            width: 220,
+            minWidth: 100,
         },
 
         {
             accessorFn: (row) => row.moduleId.name,
             id: "module",
             header: "Module",
+            enableSorting: true,
+            width: 220,
+            minWidth: 150,
         },
 
         {
@@ -36,6 +42,8 @@ export function permissionColumns(
                     />
                 );
             },
+            width:120,
+
         },
 
         {
@@ -54,6 +62,7 @@ export function permissionColumns(
                     />
                 );
             },
+            width:120,
         },
 
         {
@@ -70,6 +79,7 @@ export function permissionColumns(
                     </button>
                 );
             },
+            width:140,
         },
     ];
 }
