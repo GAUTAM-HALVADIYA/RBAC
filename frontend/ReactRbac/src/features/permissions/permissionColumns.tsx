@@ -21,6 +21,7 @@ export function permissionColumns(
             id: "module",
             header: "Module",
             enableSorting: true,
+            enableEditing: true,
             width: 220,
             minWidth: 150,
         },

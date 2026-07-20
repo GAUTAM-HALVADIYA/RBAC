@@ -1,4 +1,5 @@
 import permissionModel from "../models/permission.model";
+import mongoose from "mongoose";
 import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/http-status.constants";
 import { CreatePermissionDto, UpdatePermissionDto } from "../dto/permission.dto";
@@ -24,11 +25,11 @@ export class PermissionService {
         const sort: any = {};
 
         if (query.roleId) {
-            filter.roleId = query.roleId;
+            filter.roleId = new mongoose.Types.ObjectId(query.roleId);
         }
 
         if (query.moduleId) {
-            filter.moduleId = query.moduleId;
+            filter.moduleId = new mongoose.Types.ObjectId(query.moduleId);
         }
 
         if (options.search) {
@@ -42,21 +43,48 @@ export class PermissionService {
             ];
         }
 
-        if (options.sortBy) {
-            sort[options.sortBy] = options.sortOrder === "desc" ? -1 : 1;
+        const pipeline: any[] = [];
+        if (Object.keys(filter).length > 0) {
+            pipeline.push({ $match: filter });
         }
+
+        pipeline.push(
+            { $lookup: { from: 'roles', localField: 'roleId', foreignField: '_id', as: 'roleId' } },
+            { $unwind: { path: '$roleId', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'modules', localField: 'moduleId', foreignField: '_id', as: 'moduleId' } },
+            { $unwind: { path: '$moduleId', preserveNullAndEmptyArrays: true } }
+        );
+
+        if (options.sortBy) {
+            if (options.sortBy === 'role' || options.sortBy === 'roleId') {
+                sort['roleId.name'] = options.sortOrder === "desc" ? -1 : 1;
+            } else if (options.sortBy === 'module' || options.sortBy === 'moduleId') {
+                sort['moduleId.name'] = options.sortOrder === "desc" ? -1 : 1;
+            } else {
+                sort[options.sortBy] = options.sortOrder === "desc" ? -1 : 1;
+            }
+        } else {
+            sort['_id'] = -1;
+        }
+
+        pipeline.push({ $sort: sort });
+        pipeline.push({ $skip: options.skip });
+        pipeline.push({ $limit: options.limit });
+
+        pipeline.push({
+            $project: {
+                permissions: 1,
+                "moduleId._id": 1,
+                "moduleId.name": 1,
+                "moduleId.key": 1,
+                "roleId._id": 1,
+                "roleId.name": 1
+            }
+        });
 
         const [totalRecords, data] = await Promise.all([
             permissionModel.countDocuments(filter),
-            permissionModel
-                .find(filter)
-                .select("permissions moduleId roleId")
-                .populate("moduleId", "name key")
-                .populate("roleId", "name")
-                .sort(sort)
-                .skip(options.skip)
-                .limit(options.limit)
-                .lean()
+            permissionModel.aggregate(pipeline)
         ]);
             
         const meta = getPaginatedMetadata(totalRecords, options.page, options.limit);

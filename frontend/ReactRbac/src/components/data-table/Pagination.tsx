@@ -1,3 +1,5 @@
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
+
 type PageSizeProps =
     | {
           showPageSize?: false;
@@ -88,37 +90,37 @@ export function Pagination(props: PaginationProps) {
             )}
 
             <nav>
-                <ul className="pagination mb-0">
+                <ul className="pagination mb-0 gap-2 align-items-center">
                     {showFirstLast && (
                         <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                            <button className="page-link" disabled={page === 1} onClick={() => onPageChange(1)}>
-                                First
+                            <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center" style={{ width: 32, height: 32, padding: 0, border: "none" }} disabled={page === 1} onClick={() => onPageChange(1)}>
+                                <ChevronsLeft size={16} />
                             </button>
                         </li>
                     )}
                     <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                        <button className="page-link" disabled={page === 1} onClick={handlePrev}>
-                            Previous
+                        <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center" style={{ width: 32, height: 32, padding: 0, border: "none" }} disabled={page === 1} onClick={handlePrev}>
+                            <ChevronLeft size={16} />
                         </button>
                     </li>
 
                     {pages.map((pageNumber) => (
                         <li key={pageNumber} className={`page-item ${page === pageNumber ? "active" : ""}`}>
-                            <button className="page-link" onClick={() => onPageChange(pageNumber)}>
+                            <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center fw-medium" style={{ width: 32, height: 32, padding: 0, border: "none" }} onClick={() => onPageChange(pageNumber)}>
                                 {pageNumber}
                             </button>
                         </li>
                     ))}
 
                     <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                        <button className="page-link" disabled={page === totalPages} onClick={handleNext}>
-                            Next
+                        <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center" style={{ width: 32, height: 32, padding: 0, border: "none" }} disabled={page === totalPages} onClick={handleNext}>
+                            <ChevronRight size={16} />
                         </button>
                     </li>
                     {showFirstLast && (
                         <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                            <button className="page-link" disabled={page === totalPages} onClick={() => onPageChange(totalPages)}>
-                                Last
+                            <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center" style={{ width: 32, height: 32, padding: 0, border: "none" }} disabled={page === totalPages} onClick={() => onPageChange(totalPages)}>
+                                <ChevronsRight size={16} />
                             </button>
                         </li>
                     )}

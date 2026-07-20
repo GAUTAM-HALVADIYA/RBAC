@@ -83,10 +83,16 @@ body {
 
 .resize-handle {
     position: absolute;
-    top: 0;
-    right: 0;
-    height: 100%;
+    top: 50%;
+    right: 4px;
+    transform: translateY(-50%);
     cursor: col-resize;
     user-select: none;
+    color: #adb5bd;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
 }
 
+.table-custom th:hover .resize-handle {
+    opacity: 1;
+}
