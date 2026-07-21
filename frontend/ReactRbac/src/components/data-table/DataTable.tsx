@@ -1,15 +1,7 @@
 import { type ReactNode } from "react";
 import { getNextSorting } from "./sorting";
-import type {DataTableProps } from "./types";
-import {
-    ArrowUpDownIcon,
-    GripVertical,
-    SortAscIcon,
-    SortDescIcon,
-    Settings2,
-    ChevronRight,
-    ChevronDown,
-} from "lucide-react";
+import type { DataTableProps } from "./types";
+import { ArrowUpDownIcon, GripVertical, SortAscIcon, SortDescIcon, Settings2, ChevronRight, ChevronDown, GripHorizontal } from "lucide-react";
 import React from "react";
 import { useColumnOrdering } from "./hooks/useColumnOrdering";
 import { useColumnVisibility } from "./hooks/useColumnVisibility";
@@ -18,6 +10,8 @@ import { useRowReordering } from "./hooks/useRowReordering";
 import { useRowSelection } from "./hooks/useRowSelection";
 import { useRowExpansion } from "./hooks/useRowExpansion";
 import { useInlineEditing } from "./hooks/useInlineEditing";
+import { ExportMenu } from "./ExportMenu";
+import { ColumnPinMenu } from "./ColumnPinMenu";
 
 export function DataTable<T>({
     data,
@@ -34,18 +28,18 @@ export function DataTable<T>({
     renderExpandedRow,
     getRowId,
     tableId,
+    columnPinning,
+    onColumnPinningChange,
 }: DataTableProps<T>) {
     const storageKey = tableId ? `datatable-state-${tableId}` : null;
 
     const { expandedRowIds, toggleRowExpanded } = useRowExpansion();
 
-    const {
-        localData,
-        draggedRowIndex,
-        handleRowDragStart,
-        handleRowDragOver,
-        handleRowDragEnd,
-    } = useRowReordering(data, enableRowReordering, onRowReorder);
+    const { localData, draggedRowIndex, handleRowDragStart, handleRowDragOver, handleRowDragEnd } = useRowReordering(
+        data,
+        enableRowReordering,
+        onRowReorder,
+    );
 
     const { selectedRowIds, toggleAllRows, toggleRow } = useRowSelection(localData, getRowId, onRowSelectionChange);
 
@@ -76,10 +70,45 @@ export function DataTable<T>({
 
     const activeColumns = orderedColumns.filter((col) => columnVisibility[col.id] !== false);
 
+    const leftPinnedColumns = activeColumns.filter((col) => columnPinning.left.includes(col.id));
+
+    const centerColumns = activeColumns.filter((col) => !columnPinning.left.includes(col.id) && !columnPinning.right.includes(col.id));
+
+    const rightPinnedColumns = activeColumns.filter((col) => columnPinning.right.includes(col.id));
+
+    const finalColumns = [...leftPinnedColumns, ...centerColumns, ...rightPinnedColumns];
+
+    const leftOffsets: Record<string, number> = {};
+
+    let leftOffset = 0;
+
+    leftPinnedColumns.forEach((col) => {
+        leftOffsets[col.id] = leftOffset;
+
+        leftOffset += columnWidths[col.id] ?? 150;
+    });
+
+    const rightOffsets: Record<string, number> = {};
+
+    let rightOffset = 0;
+
+    [...rightPinnedColumns].reverse().forEach((col) => {
+        rightOffsets[col.id] = rightOffset;
+
+        rightOffset += columnWidths[col.id] ?? 150;
+    });
+
+    const selectedRows = localData.filter((row) => {
+        const id = getRowId ? getRowId(row) : String((row as any)._id || (row as any).id);
+
+        return selectedRowIds.has(id);
+    });
+
     return (
         <div className="d-flex flex-column gap-3">
             <div className="d-flex justify-content-end" ref={dropdownRef}>
-                <div className="dropdown position-relative">
+                <ExportMenu rows={selectedRows} columns={finalColumns} />
+                <div className="dropdown position-relative ms-2">
                     <button
                         className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
                         onClick={() => setShowColumnToggle(!showColumnToggle)}
@@ -97,9 +126,7 @@ export function DataTable<T>({
                                         type="checkbox"
                                         className="form-check-input"
                                         id={`col-toggle-${col.id}`}
-                                        checked={
-                                            columnVisibility[col.id] !== false
-                                        }
+                                        checked={columnVisibility[col.id] !== false}
                                         onChange={() => toggleColumnVisibility(col.id)}
                                     />
                                     <label
@@ -115,10 +142,7 @@ export function DataTable<T>({
                     )}
                 </div>
             </div>
-            <div
-                className="table-responsive"
-                style={{ maxHeight, overflowY: "auto" }}
-            >
+            <div className="table-responsive" style={{ maxHeight, overflowY: "auto" }}>
                 <table className="table table-hover table-custom mb-0">
                     <thead
                         style={{
@@ -136,84 +160,91 @@ export function DataTable<T>({
                                 <th style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }}></th>
                             )}
                             {enableRowSelection && (
-                                <th style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }} className="align-middle text-center py-3">
-                                    <input 
-                                        type="checkbox" 
+                                <th
+                                    style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }}
+                                    className="align-middle text-center py-3"
+                                >
+                                    <input
+                                        type="checkbox"
                                         className="form-check-input"
-                                        checked={localData.length > 0 && localData.every(row => selectedRowIds.has(getRowId ? getRowId(row) : String((row as any)._id || (row as any).id)))}
+                                        checked={
+                                            localData.length > 0 &&
+                                            localData.every((row) =>
+                                                selectedRowIds.has(
+                                                    getRowId ? getRowId(row) : String((row as any)._id || (row as any).id),
+                                                ),
+                                            )
+                                        }
                                         onChange={(e) => toggleAllRows(e.target.checked)}
                                     />
                                 </th>
                             )}
-                            {activeColumns.map((col) => (
+                            {finalColumns.map((col) => (
                                 <th
                                     key={col.id}
                                     className="text-muted fw-bold small text-uppercase py-3 px-3"
                                     draggable
-                                    onDragStart={(e) =>
-                                        handleDragStart(e, col.id)
-                                    }
-                                    onDragOver={(e) =>
-                                        handleDragOver(e)
-                                    }
+                                    onDragStart={(e) => handleDragStart(e, col.id)}
+                                    onDragOver={(e) => handleDragOver(e)}
                                     onDrop={(e) => handleDrop(e, col.id)}
                                     onDragEnd={handleDragEnd}
                                     style={{
-                                        backgroundColor:
-                                            draggedColumnId === col.id
-                                                ? "#f8f9fa"
-                                                : "#fff",
-                                        opacity:
-                                            draggedColumnId === col.id
-                                                ? 0.5
-                                                : 1,
+                                        backgroundColor: draggedColumnId === col.id ? "#f8f9fa" : "#fff",
+                                        opacity: draggedColumnId === col.id ? 0.5 : 1,
                                         borderBottom: "2px solid #dee2e6",
-                                        cursor: col.enableSorting
-                                            ? "pointer"
-                                            : "grab",
+                                        cursor: col.enableSorting ? "pointer" : "grab",
                                         userSelect: "none",
                                         width: columnWidths[col.id],
                                         minWidth: columnWidths[col.id],
                                         maxWidth: columnWidths[col.id],
+                                        position:
+                                            columnPinning.left.includes(col.id) || columnPinning.right.includes(col.id)
+                                                ? "sticky"
+                                                : "relative",
+
+                                        left: columnPinning.left.includes(col.id) ? leftOffsets[col.id] : undefined,
+
+                                        right: columnPinning.right.includes(col.id) ? rightOffsets[col.id] : undefined,
+
+                                        zIndex: 0,
                                     }}
                                 >
-                                    <div
-                                        className="d-flex align-items-center gap-2"
-                                        onClick={() => {
-                                            if (col.enableSorting) {
-                                                handleSort(col.id);
-                                            }
-                                        }}
-                                    >
-                                        {col.header}
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div
+                                            className="d-flex align-items-center gap-2"
+                                            onClick={() => {
+                                                if (col.enableSorting) {
+                                                    handleSort(col.id);
+                                                }
+                                            }}
+                                        >
+                                            {col.header}
 
-                                        {col.enableSorting && (
-                                            <>
-                                                {sorting.column !== col.id && (
-                                                    <ArrowUpDownIcon />
-                                                )}
+                                            {col.enableSorting && (
+                                                <>
+                                                    {sorting.column !== col.id && <ArrowUpDownIcon />}
 
-                                                {sorting.column === col.id &&
-                                                    sorting.direction ===
-                                                        "asc" && (
-                                                        <SortAscIcon />
-                                                    )}
+                                                    {sorting.column === col.id && sorting.direction === "asc" && <SortAscIcon />}
 
-                                                {sorting.column === col.id &&
-                                                    sorting.direction ===
-                                                        "desc" && (
-                                                        <SortDescIcon />
-                                                    )}
-                                            </>
-                                        )}
+                                                    {sorting.column === col.id && sorting.direction === "desc" && <SortDescIcon />}
+                                                </>
+                                            )}
+                                        </div>
+
+                                        <div className="d-flex align-items-center gap-1">
+                                            <ColumnPinMenu
+                                                columnId={col.id}
+                                                columnPinning={columnPinning}
+                                                onColumnPinningChange={onColumnPinningChange}
+                                            />
+
+                                            <GripVertical
+                                                className="resize-handle"
+                                                onMouseDown={(e) => handleResizeStart(e, col.id)}
+                                                size={18}
+                                            />
+                                        </div>
                                     </div>
-                                    <GripVertical
-                                        className="resize-handle"
-                                        onMouseDown={(e) =>
-                                            handleResizeStart(e, col.id)
-                                        }
-                                        size={18}
-                                    />
                                 </th>
                             ))}
                         </tr>
@@ -224,22 +255,38 @@ export function DataTable<T>({
                                 <tr key={`skeleton-${i}`}>
                                     {renderExpandedRow && (
                                         <td className="align-middle p-3 placeholder-glow" style={{ width: 40 }}>
-                                            <span className="placeholder bg-secondary opacity-25 rounded w-100" style={{ height: "18px", display: "inline-block" }}></span>
+                                            <span
+                                                className="placeholder bg-secondary opacity-25 rounded w-100"
+                                                style={{ height: "18px", display: "inline-block" }}
+                                            ></span>
                                         </td>
                                     )}
                                     {enableRowReordering && (
                                         <td className="align-middle p-3 placeholder-glow" style={{ width: 36 }}>
-                                            <span className="placeholder bg-secondary opacity-25 rounded w-100" style={{ height: "18px", display: "inline-block" }}></span>
+                                            <span
+                                                className="placeholder bg-secondary opacity-25 rounded w-100"
+                                                style={{ height: "18px", display: "inline-block" }}
+                                            ></span>
                                         </td>
                                     )}
                                     {enableRowSelection && (
                                         <td className="align-middle p-3 placeholder-glow" style={{ width: 36 }}>
-                                            <span className="placeholder bg-secondary opacity-25 rounded w-100" style={{ height: "18px", display: "inline-block" }}></span>
+                                            <span
+                                                className="placeholder bg-secondary opacity-25 rounded w-100"
+                                                style={{ height: "18px", display: "inline-block" }}
+                                            ></span>
                                         </td>
                                     )}
-                                    {activeColumns.map(col => (
+                                    {finalColumns.map((col) => (
                                         <td key={`skeleton-col-${col.id}`} className="align-middle p-3 placeholder-glow">
-                                            <span className="placeholder bg-secondary opacity-25 rounded" style={{ height: "18px", width: `${Math.floor(Math.random() * 40) + 40}%`, display: "inline-block" }}></span>
+                                            <span
+                                                className="placeholder bg-secondary opacity-25 rounded"
+                                                style={{
+                                                    height: "18px",
+                                                    width: `${Math.floor(Math.random() * 40) + 40}%`,
+                                                    display: "inline-block",
+                                                }}
+                                            ></span>
                                         </td>
                                     ))}
                                 </tr>
@@ -247,7 +294,12 @@ export function DataTable<T>({
                         ) : localData.length === 0 ? (
                             <tr>
                                 <td
-                                    colSpan={activeColumns.length + (enableRowReordering ? 1 : 0) + (enableRowSelection ? 1 : 0) + (renderExpandedRow ? 1 : 0)}
+                                    colSpan={
+                                        finalColumns.length +
+                                        (enableRowReordering ? 1 : 0) +
+                                        (enableRowSelection ? 1 : 0) +
+                                        (renderExpandedRow ? 1 : 0)
+                                    }
                                     className="text-center py-4 text-muted"
                                 >
                                     No data available
@@ -259,115 +311,150 @@ export function DataTable<T>({
                                 const isExpanded = expandedRowIds.has(rowId);
 
                                 return (
-                                <React.Fragment key={rowId || rowIndex}>
-                                    <tr 
-                                        draggable={enableRowReordering}
-                                        onDragStart={(e) => handleRowDragStart(e, rowIndex)}
-                                        onDragOver={(e) => handleRowDragOver(e, rowIndex)}
-                                        onDragEnd={handleRowDragEnd}
-                                        style={{
-                                            opacity: draggedRowIndex === rowIndex ? 0.5 : 1,
-                                            backgroundColor: draggedRowIndex === rowIndex ? "#f8f9fa" : "inherit"
-                                        }}
-                                    >
-                                        {renderExpandedRow && (
-                                            <td 
-                                                className="align-middle text-center" 
-                                                style={{ width: 36, cursor: "pointer" }}
-                                                onClick={() => toggleRowExpanded(rowId)}
-                                            >
-                                                {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-                                            </td>
-                                        )}
-                                        {enableRowReordering && (
-                                        <td className="align-middle text-center text-muted" style={{ cursor: "grab", width: 36 }}>
-                                            <GripVertical size={16} />
-                                        </td>
-                                    )}
-                                    {enableRowSelection && (
-                                        <td className="align-middle text-center" style={{ width: 36 }}>
-                                            <input 
-                                                type="checkbox" 
-                                                className="form-check-input"
-                                                checked={selectedRowIds.has(getRowId ? getRowId(row) : String((row as any)._id || (row as any).id))}
-                                                onChange={(e) => toggleRow(row, e.target.checked)}
-                                            />
-                                        </td>
-                                    )}
-                                    {activeColumns.map((col) => {
-                                        const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.columnId === col.id;
-                                        
-                                        let content: ReactNode = null;
-                                        if (isEditing) {
-                                            content = (
-                                                <input
-                                                    type="text"
-                                                    className="form-control form-control-sm"
-                                                    value={editValue}
-                                                    autoFocus
-                                                    onChange={(e) => setEditValue(e.target.value)}
-                                                    onBlur={() => {
-                                                        if (onCellEdit) {
-                                                            onCellEdit(rowIndex, col.id, editValue);
-                                                        }
-                                                        stopEditing();
-                                                    }}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            if (onCellEdit) {
-                                                                onCellEdit(rowIndex, col.id, editValue);
-                                                            }
-                                                            stopEditing();
-                                                        } else if (e.key === 'Escape') {
-                                                            stopEditing();
-                                                        }
-                                                    }}
-                                                />
-                                            );
-                                        } else if (col.cell) {
-                                            content = col.cell({
-                                                row: { original: row },
-                                            });
-                                        } else if (col.accessorFn) {
-                                            content = col.accessorFn(row);
-                                        }
+                                   <React.Fragment key={rowIndex}>
+                                  
+                                        <tr
+                                            draggable={enableRowReordering}
+                                            onDragStart={(e) => handleRowDragStart(e, rowIndex)}
+                                            onDragOver={(e) => handleRowDragOver(e, rowIndex)}
+                                            onDragEnd={handleRowDragEnd}
+                                            style={{
+                                                opacity: draggedRowIndex === rowIndex ? 0.5 : 1,
+                                                backgroundColor: draggedRowIndex === rowIndex ? "#f8f9fa" : "inherit",
+                                            }}
+                                        >
+                                            {renderExpandedRow && (
+                                                <td
+                                                    className="align-middle text-center"
+                                                    style={{ width: 36, cursor: "pointer" }}
+                                                    onClick={() => toggleRowExpanded(rowId)}
+                                                >
+                                                    {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+                                                </td>
+                                            )}
+                                            {enableRowReordering && (
+                                                <td
+                                                    className="align-middle text-center text-muted"
+                                                    style={{ cursor: "grab", width: 36 }}
+                                                >
+                                                    <GripHorizontal size={16} />
+                                                </td>
+                                            )}
+                                            {enableRowSelection && (
+                                                <td className="align-middle text-center" style={{ width: 36 }}>
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-check-input"
+                                                        checked={selectedRowIds.has(
+                                                            getRowId ? getRowId(row) : String((row as any)._id || (row as any).id),
+                                                        )}
+                                                        onChange={(e) => toggleRow(row, e.target.checked)}
+                                                    />
+                                                </td>
+                                            )}
+                                            {finalColumns.map((col) => {
+                                                const isEditing =
+                                                    editingCell?.rowIndex === rowIndex && editingCell?.columnId === col.id;
 
-                                        return (
-                                            <td
-                                                key={col.id}
-                                                className="align-middle"
-                                                style={{
-                                                    width: columnWidths[col.id] || 150,
-                                                    overflow: isEditing ? "visible" : "hidden",
-                                                    textOverflow: isEditing ? "clip" : "ellipsis",
-                                                    whiteSpace: "nowrap"
-                                                }}
-                                                onDoubleClick={() => {
-                                                    if (col.enableEditing) {
-                                                        let val = "";
-                                                        if (col.accessorFn) {
-                                                            const res = col.accessorFn(row);
-                                                            val = typeof res === "string" || typeof res === "number" ? String(res) : "";
-                                                        } else {
-                                                            val = String((row as any)[col.id] || "");
-                                                        }
-                                                        startEditing(rowIndex, col.id, val);
-                                                    }
-                                                }}
-                                            >
-                                                {content}
-                                            </td>
-                                        );
-                                    })}
-                                    </tr>
-                                    {isExpanded && renderExpandedRow && (
-                                        <tr>
-                                            <td colSpan={activeColumns.length + (enableRowReordering ? 1 : 0) + (enableRowSelection ? 1 : 0) + 1} className="p-0 border-0">
-                                                {renderExpandedRow(row)}
-                                            </td>
+                                                let content: ReactNode = null;
+                                                if (isEditing) {
+                                                    content = (
+                                                        <input
+                                                            type="text"
+                                                            className="form-control form-control-sm"
+                                                            value={editValue}
+                                                            autoFocus
+                                                            onChange={(e) => setEditValue(e.target.value)}
+                                                            onBlur={() => {
+                                                                if (onCellEdit) {
+                                                                    onCellEdit(rowIndex, col.id, editValue);
+                                                                }
+                                                                stopEditing();
+                                                            }}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === "Enter") {
+                                                                    if (onCellEdit) {
+                                                                        onCellEdit(rowIndex, col.id, editValue);
+                                                                    }
+                                                                    stopEditing();
+                                                                } else if (e.key === "Escape") {
+                                                                    stopEditing();
+                                                                }
+                                                            }}
+                                                        />
+                                                    );
+                                                } else if (col.cell) {
+                                                    content = col.cell({
+                                                        row: { original: row },
+                                                    });
+                                                } else if (col.accessorFn) {
+                                                    content = col.accessorFn(row);
+                                                }
+
+                                                return (
+                                                    <td
+                                                        key={col.id}
+                                                        className="align-middle"
+                                                        style={{
+                                                            width: columnWidths[col.id] || 150,
+                                                            overflow: isEditing ? "visible" : "hidden",
+                                                            textOverflow: isEditing ? "clip" : "ellipsis",
+                                                            whiteSpace: "nowrap",
+                                                            position:
+                                                                columnPinning.left.includes(col.id) ||
+                                                                columnPinning.right.includes(col.id)
+                                                                    ? "sticky"
+                                                                    : "relative",
+
+                                                            left: columnPinning.left.includes(col.id)
+                                                                ? leftOffsets[col.id]
+                                                                : undefined,
+
+                                                            right: columnPinning.right.includes(col.id)
+                                                                ? rightOffsets[col.id]
+                                                                : undefined,
+
+                                                            background: "#fff",
+
+                                                            zIndex: 0
+                                                        }}
+                                                        onDoubleClick={() => {
+                                                            if (col.enableEditing) {
+                                                                let val = "";
+                                                                if (col.accessorFn) {
+                                                                    const res = col.accessorFn(row);
+                                                                    val =
+                                                                        typeof res === "string" || typeof res === "number"
+                                                                            ? String(res)
+                                                                            : "";
+                                                                } else {
+                                                                    val = String((row as any)[col.id] || "");
+                                                                }
+                                                                startEditing(rowIndex, col.id, val);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {content}
+                                                    </td>
+                                                );
+                                            })}
                                         </tr>
-                                    )}
-                                </React.Fragment>
+                                        {isExpanded && renderExpandedRow && (
+                                            <tr>
+                                                <td
+                                                    colSpan={
+                                                        finalColumns.length +
+                                                        (enableRowReordering ? 1 : 0) +
+                                                        (enableRowSelection ? 1 : 0) +
+                                                        1
+                                                    }
+                                                    className="p-0 border-0"
+                                                >
+                                                    {renderExpandedRow(row)}
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </React.Fragment>
                                 );
                             })
                         )}

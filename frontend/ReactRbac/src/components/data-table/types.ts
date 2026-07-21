@@ -20,7 +20,18 @@ export type ColumnDef<T> = {
     width?: number;
     minWidth?: number;
     maxWidth?: number;
+
+    exportValue?: (row: T) => string | number | boolean;
+    enableExport?: boolean;
 };
+
+export type PinDirection = "left" | "right" | null;
+
+export interface ColumnPinningState {
+    left: string[];
+    right: string[];
+}
+
 
 export type DataTableProps<T> = {
     data: T[];
@@ -34,13 +45,24 @@ export type DataTableProps<T> = {
 
     enableRowSelection?: boolean;
     onRowSelectionChange?: (selectedRows: T[]) => void;
-    
+
     enableRowReordering?: boolean;
     onRowReorder?: (newData: T[]) => void;
-    
+
     renderExpandedRow?: (row: T) => ReactNode;
 
     getRowId?: (row: T) => string;
-    
+
     tableId?: string;
+
+    columnPinning: ColumnPinningState;
+    onColumnPinningChange: (value: ColumnPinningState) => void;
+    
 };
+
+export interface ExportColumn<T> {
+    id: string;
+    header: string;
+    accessorFn?: (row: T) => React.ReactNode;
+}
+

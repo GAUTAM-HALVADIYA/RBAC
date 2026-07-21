@@ -12,21 +12,16 @@ import { Pagination } from "../components/data-table/Pagination";
 import type { SortingState } from "../components/data-table/types";
 import { updateModule } from "../services/module.service";
 import { useDebounce } from "../hooks/useDebounce";
+import { useExport } from "../components/data-table/hooks/useExport";
+import { useColumnPinning } from "../components/data-table/hooks/useColumnPinning";
 
-export default function Permissions({
-    roleId,
-    moduleId,
-    isEmbedded,
-}: {
-    roleId?: string;
-    moduleId?: string;
-    isEmbedded?: boolean;
-}) {
+export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?: string; moduleId?: string; isEmbedded?: boolean }) {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
-
+    const { exportCSV, exportExcel } = useExport<Permission>();
+    const { columnPinning, setColumnPinning } = useColumnPinning();
     useEffect(() => {
         setPage(1);
     }, [debouncedSearch]);
@@ -37,21 +32,18 @@ export default function Permissions({
         column: null,
         direction: null,
     });
-    const { permissions, loading, error, savePermission, meta } =
-        usePermissions(
-            page,
-            limit,
-            debouncedSearch,
-            // sortBy,
-            // sortOrder,
-            sorting.column ?? "",
-            sorting.direction ?? "",
-            roleId,
-            moduleId,
-        );
+    const { permissions, loading, error, savePermission, meta } = usePermissions(
+        page,
+        limit,
+        debouncedSearch,
+        // sortBy,
+        // sortOrder,
+        sorting.column ?? "",
+        sorting.direction ?? "",
+        roleId,
+        moduleId,
+    );
 
-    // Automatically go to the last valid page if the current page exceeds total pages 
-    // (e.g. when limit increases or records are deleted)
     useEffect(() => {
         if (meta && meta.totalPages > 0 && page > meta.totalPages) {
             setPage(meta.totalPages);
@@ -60,6 +52,7 @@ export default function Permissions({
 
     const { fetchProfileData } = useAuth();
     const [rows, setRows] = useState<Permission[]>([]);
+    const [selectedRows, setSelectedRows] = useState<Permission[]>([]);
 
     useEffect(() => {
         setRows(permissions);
@@ -98,11 +91,7 @@ export default function Permissions({
     };
 
     const handleSave = async (permission: Permission) => {
-        await savePermission(
-            permission._id,
-            permission.permissions.read,
-            permission.permissions.write,
-        );
+        await savePermission(permission._id, permission.permissions.read, permission.permissions.write);
         if (fetchProfileData) {
             await fetchProfileData();
         }
@@ -115,13 +104,13 @@ export default function Permissions({
             try {
                 // 1. Update in Backend
                 await updateModule(rowToUpdate.moduleId._id, { name: newValue });
-                
+
                 // 2. Update the local UI state optimistically
                 setRows((prevRows) => {
                     const newRows = [...prevRows];
                     newRows[rowIndex] = {
                         ...newRows[rowIndex],
-                        moduleId: { ...newRows[rowIndex].moduleId, name: newValue }
+                        moduleId: { ...newRows[rowIndex].moduleId, name: newValue },
                     };
                     return newRows;
                 });
@@ -131,6 +120,8 @@ export default function Permissions({
             }
         }
     };
+
+    const columns = permissionColumns(handleReadChange, handleWriteChange, handleSave);
 
     return (
         <>
@@ -167,25 +158,29 @@ export default function Permissions({
                         </div>
                     )}
                     {error && <div className="alert alert-danger">{error}</div>}
+                    {/* <div className="d-flex justify-content-end gap-2 mb-3">
+                        <button className="btn btn-success" onClick={() => exportExcel(selectedRows, columns, "permissions")}>
+                            Export Excel
+                        </button>
 
+                        <button className="btn btn-outline-success" onClick={() => exportCSV(selectedRows, columns, "permissions")}>
+                            Export CSV
+                        </button>
+                    </div> */}
                     <DataTable
                         tableId="permissions-table"
                         data={rows}
-                        columns={permissionColumns(
-                            handleReadChange,
-                            handleWriteChange,
-                            handleSave,
-                        )}
+                        columns={columns}
                         maxHeight="600px"
                         sorting={sorting}
                         onSortingChange={setSorting}
                         isLoading={loading}
                         onCellEdit={handleCellEdit}
                         enableRowSelection={true}
-                        onRowSelectionChange={(selectedRows) => {
-                            console.log("Selected rows:", selectedRows);
-                        }}
+                        onRowSelectionChange={setSelectedRows}
                         enableRowReordering={true}
+                        columnPinning={columnPinning}
+                        onColumnPinningChange={setColumnPinning}
                         onRowReorder={(newRows) => {
                             setRows(newRows);
                         }}
