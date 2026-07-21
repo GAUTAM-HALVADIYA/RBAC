@@ -2,15 +2,23 @@ import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";
 import { useUsers } from "../hooks/useUsers";
 import { getRoles } from "../services/role.service";
+import { DataTable } from "../components/data-table/DataTable";
+import { userColumns, type User } from "../features/users/userColumns";
+import type { SortingState } from "../components/data-table/types";
+import { useColumnPinning } from "../components/data-table/hooks/useColumnPinning";
 
 export default function Users() {
-    const { users, loading, error, meta, page, setPage, fetchUsers, handleUpdateUser, handleDeleteUser } = useUsers();
+    const { users, loading, error, meta, page, setPage, limit, setLimit, fetchUsers, handleUpdateUser, handleDeleteUser } = useUsers();
     const [roles, setRoles] = useState<any[]>([]);
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [editingUser, setEditingUser] = useState<any>(null);
     const [editFormData, setEditFormData] = useState({ name: "", role: "" });
     const [actionError, setActionError] = useState("");
+
+    const [sorting, setSorting] = useState<SortingState>({ column: null, direction: null });
+    const { columnPinning, setColumnPinning } = useColumnPinning();
+    const [selectedRows, setSelectedRows] = useState<User[]>([]);
 
     useEffect(() => {
         fetchUsers();
@@ -62,85 +70,40 @@ export default function Users() {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="card  border-0 shadow-sm">
-                <div className="card-body p-0">
-                    <div className="table-responsive">
-                        <table className="table table-hover table-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th className="text-end px-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td colSpan={4} className="text-center py-4">
-                                            <div className="spinner-border text-primary" role="status"></div>
-                                        </td>
-                                    </tr>
-                                ) : users.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={4} className="text-center text-muted py-4">
-                                            No users available
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    users.map((user) => (
-                                        <tr key={user._id}>
-                                            <td className="align-middle fw-medium">{user.name}</td>
-                                            <td className="align-middle text-muted">{user.email}</td>
-                                            <td className="align-middle">
-                                                <span className="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
-                                                    {user.role?.name || "No Role"}
-                                                </span>
-                                            </td>
-                                            <td className="align-middle text-end px-4">
-                                                <button
-                                                    className="btn btn-sm btn-light text-primary me-2 shadow-sm"
-                                                    onClick={() => handleEditClick(user)}
-                                                >
-                                                    <i className="bi bi-pencil-square"></i> Edit
-                                                </button>
-                                                <button
-                                                    className="btn btn-sm btn-light text-danger shadow-sm"
-                                                    onClick={() => onDeleteClick(user._id)}
-                                                >
-                                                    <i className="bi bi-trash-fill"></i> Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {meta && meta.totalPages > 1 && (
-                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light ">
-                            <span className="text-muted small fw-medium">
-                                Showing page {meta.currentPage} of {meta.totalPages}
-                            </span>
-                            <div className="d-flex gap-2">
-                                <button
-                                    className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={page === 1}
-                                    onClick={() => setPage(page - 1)}
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={page >= meta.totalPages}
-                                    onClick={() => setPage(page + 1)}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        </div>
-                    )}
+            <div className="card border-0 shadow-sm">
+                <div className="card-body">
+                    <DataTable
+                        tableId="users-table"
+                        data={users}
+                        columns={userColumns(handleEditClick, onDeleteClick)}
+                        isLoading={loading}
+                        enableSorting={true}
+                        sorting={sorting}
+                        onSortingChange={setSorting}
+                        enableRowSelection={true}
+                        onRowSelectionChange={setSelectedRows}
+                        enableColumnPinning={true}
+                        columnPinning={columnPinning}
+                        onColumnPinningChange={setColumnPinning}
+                        enableColumnVisibility={true}
+                        enableExport={true}
+                        exportFileName="users"
+                        enablePagination={true}
+                        page={page}
+                        pageSize={limit}
+                        showPageSize={true}
+                        onPageSizeChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setPage(1);
+                            fetchUsers(1, newLimit);
+                        }}
+                        pageSizeOptions={[10, 15, 30]}
+                        totalPages={meta?.totalPages || 1}
+                        totalRecords={meta?.totalRecords || 0}
+                        onPageChange={setPage}
+                        showFirstLast={true}
+                        showInfo={true}
+                    />
                 </div>
             </div>
 

@@ -51,16 +51,21 @@ export function useExport<T>() {
 
     function exportCSV(
         rows: T[],
-        columns: { id: string; header: string; accessorFn?: (row: T) => any }[],
+        columns: ColumnDef<T>[],
         filename = "table"
     ) {
+        const exportableColumns = columns.filter((c) => c.enableExport !== false);
         const data = rows.map((row) => {
             const obj: Record<string, any> = {};
 
-            columns.forEach((col) => {
-                obj[col.header] = col.accessorFn
-                    ? col.accessorFn(row)
-                    : "";
+            exportableColumns.forEach((col) => {
+                if (col.exportValue) {
+                    obj[col.header] = col.exportValue(row);
+                } else if (col.accessorFn) {
+                    obj[col.header] = col.accessorFn(row);
+                } else {
+                    obj[col.header] = "";
+                }
             });
 
             return obj;
@@ -77,16 +82,21 @@ export function useExport<T>() {
 
     function exportExcel(
         rows: T[],
-        columns: { id: string; header: string; accessorFn?: (row: T) => any }[],
+        columns: ColumnDef<T>[],
         filename = "table"
     ) {
+        const exportableColumns = columns.filter((c) => c.enableExport !== false);
         const data = rows.map((row) => {
             const obj: Record<string, any> = {};
 
-            columns.forEach((col) => {
-                obj[col.header] = col.accessorFn
-                    ? col.accessorFn(row)
-                    : "";
+            exportableColumns.forEach((col) => {
+                if (col.exportValue) {
+                    obj[col.header] = col.exportValue(row);
+                } else if (col.accessorFn) {
+                    obj[col.header] = col.accessorFn(row);
+                } else {
+                    obj[col.header] = "";
+                }
             });
 
             return obj;

@@ -31,6 +31,8 @@ export function permissionColumns(
 
             header: "Read",
 
+            exportValue: (row) => (row.permissions.read ? "Yes" : "No"),
+
             cell: ({ row }) => {
                 const permission = row.original;
 
@@ -52,6 +54,8 @@ export function permissionColumns(
 
             header: "Write",
 
+            exportValue: (row) => (row.permissions.write ? "Yes" : "No"),
+
             cell: ({ row }) => {
                 const permission = row.original;
 
@@ -70,6 +74,8 @@ export function permissionColumns(
             id: "action",
 
             header: "Action",
+
+            enableExport: false,
 
             cell: ({ row }) => {
                 const permission = row.original;

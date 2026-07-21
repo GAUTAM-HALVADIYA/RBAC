@@ -8,12 +8,13 @@ export function useModules() {
     const [error, setError] = useState('');
     const [meta, setMeta] = useState<any>(null);
     const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
 
-    const fetchModules = useCallback(async (currentPage: number = page, limit: number = 10) => {
+    const fetchModules = useCallback(async (currentPage: number = page, currentLimit: number = limit) => {
         try {
             setLoading(true);
             setError('');
-            const res = await getModules({ page: currentPage, limit });
+            const res = await getModules({ page: currentPage, limit: currentLimit });
             setModules(res.data);
             if (res.meta) setMeta(res.meta);
         } catch (err) {
@@ -70,6 +71,8 @@ export function useModules() {
         meta,
         page,
         setPage,
+        limit,
+        setLimit,
         fetchModules,
         handleCreateModule,
         handleUpdateModule,

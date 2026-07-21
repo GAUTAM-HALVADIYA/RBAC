@@ -8,12 +8,13 @@ export function useUsers() {
     const [error, setError] = useState('');
     const [meta, setMeta] = useState<any>(null);
     const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
     
-    const fetchUsers = useCallback(async (currentPage: number = page) => {
+    const fetchUsers = useCallback(async (currentPage: number = page, currentLimit: number = limit) => {
         try {
             setLoading(true);
             setError('');
-            const res = await getUsers({ page: currentPage, limit: 10 });
+            const res = await getUsers({ page: currentPage, limit: currentLimit });
             setUsers(res.data);
             setMeta(res.meta);
         } catch (err) {
@@ -57,6 +58,8 @@ export function useUsers() {
         meta,
         page,
         setPage,
+        limit,
+        setLimit,
         fetchUsers,
         handleUpdateUser,
         handleDeleteUser

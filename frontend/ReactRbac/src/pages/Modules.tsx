@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";
 import { useModules } from "../hooks/useModules";
 import Permissions from "./Permissions";
+import { DataTable } from "../components/data-table/DataTable";
+import { moduleColumns, type Module } from "../features/modules/moduleColumns";
+import type { SortingState } from "../components/data-table/types";
+import { useColumnPinning } from "../components/data-table/hooks/useColumnPinning";
 
 export default function Modules() {
     const {
@@ -11,6 +15,8 @@ export default function Modules() {
         meta,
         page,
         setPage,
+        limit,
+        setLimit,
         fetchModules,
         handleCreateModule,
         handleUpdateModule,
@@ -26,6 +32,10 @@ export default function Modules() {
         isActive: true,
     });
     const [actionError, setActionError] = useState("");
+
+    const [sorting, setSorting] = useState<SortingState>({ column: null, direction: null });
+    const { columnPinning, setColumnPinning } = useColumnPinning();
+    const [selectedRows, setSelectedRows] = useState<Module[]>([]);
 
     useEffect(() => {
         fetchModules();
@@ -90,111 +100,40 @@ export default function Modules() {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="card  border-0 shadow-sm">
-                <div className="card-body p-0">
-                    <div className="table-responsive">
-                        <table className="table table-hover table-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Module Name</th>
-                                    <th>Key</th>
-                                    <th>Status</th>
-                                    <th className="text-end px-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td
-                                            colSpan={4}
-                                            className="text-center py-4"
-                                        >
-                                            <div
-                                                className="spinner-border text-primary"
-                                                role="status"
-                                            ></div>
-                                        </td>
-                                    </tr>
-                                ) : modules.length === 0 ? (
-                                    <tr>
-                                        <td
-                                            colSpan={4}
-                                            className="text-center text-muted py-4"
-                                        >
-                                            No modules available
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    modules.map((mod) => (
-                                        <tr key={mod._id}>
-                                            <td className="align-middle fw-medium">
-                                                {mod.name}
-                                            </td>
-                                            <td className="align-middle text-muted">
-                                                <code className="bg-light px-2 py-1 rounded border">
-                                                    {mod.key}
-                                                </code>
-                                            </td>
-                                            <td className="align-middle">
-                                                <span
-                                                    className={`badge ${mod.isActive ? "bg-success-subtle text-success border-success" : "bg-danger-subtle text-danger border-danger"} px-3 py-2 rounded-pill shadow-sm border border-opacity-25`}
-                                                >
-                                                    {mod.isActive
-                                                        ? "Active"
-                                                        : "Inactive"}
-                                                </span>
-                                            </td>
-                                            <td className="align-middle text-end px-4">
-                                                <button
-                                                    className="btn btn-sm btn-light text-primary me-2 shadow-sm"
-                                                    onClick={() =>
-                                                        handleEditClick(mod)
-                                                    }
-                                                >
-                                                    <i className="bi bi-pencil-square"></i>{" "}
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    className="btn btn-sm btn-light text-danger shadow-sm"
-                                                    onClick={() =>
-                                                        onDeleteClick(mod._id)
-                                                    }
-                                                >
-                                                    <i className="bi bi-trash-fill"></i>{" "}
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {meta && meta.totalPages > 1 && (
-                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light ">
-                            <span className="text-muted small fw-medium">
-                                Showing page {meta.currentPage} of{" "}
-                                {meta.totalPages}
-                            </span>
-                            <div className="d-flex gap-2">
-                                <button
-                                    className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={page === 1}
-                                    onClick={() => setPage(page - 1)}
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={page >= meta.totalPages}
-                                    onClick={() => setPage(page + 1)}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        </div>
-                    )}
+            <div className="card border-0 shadow-sm">
+                <div className="card-body">
+                    <DataTable
+                        tableId="modules-table"
+                        data={modules}
+                        columns={moduleColumns(handleEditClick, onDeleteClick)}
+                        isLoading={loading}
+                        enableSorting={true}
+                        sorting={sorting}
+                        onSortingChange={setSorting}
+                        enableRowSelection={true}
+                        onRowSelectionChange={setSelectedRows}
+                        enableColumnPinning={true}
+                        columnPinning={columnPinning}
+                        onColumnPinningChange={setColumnPinning}
+                        enableColumnVisibility={true}
+                        enableExport={true}
+                        exportFileName="modules"
+                        enablePagination={true}
+                        page={page}
+                        pageSize={limit}
+                        showPageSize={true}
+                        onPageSizeChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setPage(1);
+                            fetchModules(1, newLimit);
+                        }}
+                        pageSizeOptions={[10, 15, 30]}
+                        totalPages={meta?.totalPages || 1}
+                        totalRecords={meta?.totalRecords || 0}
+                        onPageChange={setPage}
+                        showFirstLast={true}
+                        showInfo={true}
+                    />
                 </div>
             </div>
 

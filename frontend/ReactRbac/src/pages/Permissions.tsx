@@ -8,11 +8,9 @@ import { useAuth } from "../hooks/useAuth";
 import type { Permission } from "../types/permission.types";
 import { DataTable } from "../components/data-table/DataTable";
 import { permissionColumns } from "../features/permissions/permissionColumns";
-import { Pagination } from "../components/data-table/Pagination";
 import type { SortingState } from "../components/data-table/types";
 import { updateModule } from "../services/module.service";
 import { useDebounce } from "../hooks/useDebounce";
-import { useExport } from "../components/data-table/hooks/useExport";
 import { useColumnPinning } from "../components/data-table/hooks/useColumnPinning";
 
 export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?: string; moduleId?: string; isEmbedded?: boolean }) {
@@ -20,7 +18,6 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
     const [limit, setLimit] = useState(10);
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
-    const { exportCSV, exportExcel } = useExport<Permission>();
     const { columnPinning, setColumnPinning } = useColumnPinning();
     useEffect(() => {
         setPage(1);
@@ -63,12 +60,12 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
             prev.map((row) =>
                 row._id === id
                     ? {
-                          ...row,
-                          permissions: {
-                              ...row.permissions,
-                              read: checked,
-                          },
-                      }
+                        ...row,
+                        permissions: {
+                            ...row.permissions,
+                            read: checked,
+                        },
+                    }
                     : row,
             ),
         );
@@ -79,12 +76,12 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
             prev.map((row) =>
                 row._id === id
                     ? {
-                          ...row,
-                          permissions: {
-                              read: checked ? true : row.permissions.read,
-                              write: checked,
-                          },
-                      }
+                        ...row,
+                        permissions: {
+                            read: checked ? true : row.permissions.read,
+                            write: checked,
+                        },
+                    }
                     : row,
             ),
         );
@@ -158,20 +155,12 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
                         </div>
                     )}
                     {error && <div className="alert alert-danger">{error}</div>}
-                    {/* <div className="d-flex justify-content-end gap-2 mb-3">
-                        <button className="btn btn-success" onClick={() => exportExcel(selectedRows, columns, "permissions")}>
-                            Export Excel
-                        </button>
-
-                        <button className="btn btn-outline-success" onClick={() => exportCSV(selectedRows, columns, "permissions")}>
-                            Export CSV
-                        </button>
-                    </div> */}
                     <DataTable
                         tableId="permissions-table"
                         data={rows}
                         columns={columns}
                         maxHeight="600px"
+                        enableSorting={true}
                         sorting={sorting}
                         onSortingChange={setSorting}
                         isLoading={loading}
@@ -179,11 +168,14 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
                         enableRowSelection={true}
                         onRowSelectionChange={setSelectedRows}
                         enableRowReordering={true}
-                        columnPinning={columnPinning}
-                        onColumnPinningChange={setColumnPinning}
                         onRowReorder={(newRows) => {
                             setRows(newRows);
                         }}
+                        enableColumnPinning={true}
+                        columnPinning={columnPinning}
+                        onColumnPinningChange={setColumnPinning}
+                        enableColumnVisibility={true}
+                        enableRowExpansion={true}
                         renderExpandedRow={(row) => (
                             <div className="bg-light p-3 border-bottom shadow-sm">
                                 <strong>Detailed Info:</strong>
@@ -194,24 +186,24 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
                                 </p>
                             </div>
                         )}
+                        enableExport={true}
+                        exportFileName="permissions"
+                        enablePagination={true}
+                        onPageChange={setPage}
+                        page={page}
+                        totalPages={meta.totalPages}
+                        totalRecords={meta.totalRecords}
+                        showFirstLast={true}
+                        showInfo={true}
+                        pageSize={limit}
+                        showPageSize={true}
+                        onPageSizeChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setPage(1);
+                        }}
+                        pageSizeOptions={[10, 15, 30]}
                     />
                 </div>
-
-                <Pagination
-                    onPageChange={setPage}
-                    page={page}
-                    totalPages={meta.totalPages}
-                    totalRecords={meta.totalRecords}
-                    showFirstLast
-                    showInfo
-                    pageSize={limit}
-                    showPageSize
-                    onPageSizeChange={(newLimit) => {
-                        setLimit(newLimit);
-                        setPage(1);
-                    }}
-                    pageSizeOptions={[10, 15, 30]}
-                />
             </div>
         </>
     );

@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import Header from "../components/layout/Header";
 import { useRoles } from "../hooks/useRoles";
 import Permissions from "./Permissions";
+import { DataTable } from "../components/data-table/DataTable";
+import { roleColumns, type Role } from "../features/roles/roleColumns";
+import type { SortingState } from "../components/data-table/types";
+import { useColumnPinning } from "../components/data-table/hooks/useColumnPinning";
 
 export default function Roles() {
     const {
@@ -11,6 +15,8 @@ export default function Roles() {
         meta,
         page,
         setPage,
+        limit,
+        setLimit,
         fetchRoles,
         handleCreateRole,
         handleUpdateRole,
@@ -22,6 +28,10 @@ export default function Roles() {
     const [editingRole, setEditingRole] = useState<any>(null);
     const [formData, setFormData] = useState({ name: "" });
     const [actionError, setActionError] = useState("");
+
+    const [sorting, setSorting] = useState<SortingState>({ column: null, direction: null });
+    const { columnPinning, setColumnPinning } = useColumnPinning();
+    const [selectedRows, setSelectedRows] = useState<Role[]>([]);
 
     useEffect(() => {
         fetchRoles();
@@ -86,97 +96,40 @@ export default function Roles() {
 
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <div className="card  border-0 shadow-sm">
-                <div className="card-body p-0">
-                    <div className="table-responsive">
-                        <table className="table table-hover table-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Role Name</th>
-                                    <th className="text-end px-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {loading ? (
-                                    <tr>
-                                        <td
-                                            colSpan={2}
-                                            className="text-center py-4"
-                                        >
-                                            <div
-                                                className="spinner-border text-primary"
-                                                role="status"
-                                            ></div>
-                                        </td>
-                                    </tr>
-                                ) : roles.length === 0 ? (
-                                    <tr>
-                                        <td
-                                            colSpan={2}
-                                            className="text-center text-muted py-4"
-                                        >
-                                            No roles available
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    roles.map((role) => (
-                                        <tr key={role._id}>
-                                            <td className="align-middle fw-medium">
-                                                <span className="badge bg-primary px-3 py-2 rounded-pill shadow-sm">
-                                                    {role.name}
-                                                </span>
-                                            </td>
-                                            <td className="align-middle text-end px-4">
-                                                <button
-                                                    className="btn btn-sm btn-light text-primary me-2 shadow-sm"
-                                                    onClick={() =>
-                                                        handleEditClick(role)
-                                                    }
-                                                >
-                                                    <i className="bi bi-pencil-square"></i>{" "}
-                                                    Edit
-                                                </button>
-                                                <button
-                                                    className="btn btn-sm btn-light text-danger shadow-sm"
-                                                    onClick={() =>
-                                                        onDeleteClick(role._id)
-                                                    }
-                                                >
-                                                    <i className="bi bi-trash-fill"></i>{" "}
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    {meta && meta.totalPages > 1 && (
-                        <div className="px-4 py-3 border-top border-light d-flex justify-content-between align-items-center bg-light ">
-                            <span className="text-muted small fw-medium">
-                                Showing page {meta.currentPage} of{" "}
-                                {meta.totalPages}
-                            </span>
-                            <div className="d-flex gap-2">
-                                <button
-                                    className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={page === 1}
-                                    onClick={() => setPage(page - 1)}
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    className="btn btn-sm btn-white border shadow-sm px-3"
-                                    disabled={page >= meta.totalPages}
-                                    onClick={() => setPage(page + 1)}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                        </div>
-                    )}
+            <div className="card border-0 shadow-sm">
+                <div className="card-body">
+                    <DataTable
+                        tableId="roles-table"
+                        data={roles}
+                        columns={roleColumns(handleEditClick, onDeleteClick)}
+                        isLoading={loading}
+                        enableSorting={true}
+                        sorting={sorting}
+                        onSortingChange={setSorting}
+                        enableRowSelection={true}
+                        onRowSelectionChange={setSelectedRows}
+                        enableColumnPinning={true}
+                        columnPinning={columnPinning}
+                        onColumnPinningChange={setColumnPinning}
+                        enableColumnVisibility={true}
+                        enableExport={true}
+                        exportFileName="roles"
+                        enablePagination={true}
+                        page={page}
+                        pageSize={limit}
+                        showPageSize={true}
+                        onPageSizeChange={(newLimit) => {
+                            setLimit(newLimit);
+                            setPage(1);
+                            fetchRoles(1, newLimit);
+                        }}
+                        pageSizeOptions={[10, 15, 30]}
+                        totalPages={meta?.totalPages || 1}
+                        totalRecords={meta?.totalRecords || 0}
+                        onPageChange={setPage}
+                        showFirstLast={true}
+                        showInfo={true}
+                    />
                 </div>
             </div>
 

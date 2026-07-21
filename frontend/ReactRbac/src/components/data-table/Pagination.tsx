@@ -89,43 +89,69 @@ export function Pagination(props: PaginationProps) {
                 </div>
             )}
 
-            <nav>
-                <ul className="pagination mb-0 gap-2 align-items-center">
-                    {showFirstLast && (
-                        <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                            <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center" style={{ width: 32, height: 32, padding: 0, border: "none" }} disabled={page === 1} onClick={() => onPageChange(1)}>
-                                <ChevronsLeft size={16} />
-                            </button>
-                        </li>
-                    )}
-                    <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-                        <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center" style={{ width: 32, height: 32, padding: 0, border: "none" }} disabled={page === 1} onClick={handlePrev}>
-                            <ChevronLeft size={16} />
-                        </button>
-                    </li>
+            <div className="d-flex align-items-center gap-1">
+                {showFirstLast && (
+                    <button
+                        className="btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle"
+                        style={{ width: 32, height: 32, padding: 0, color: page === 1 ? "#dee2e6" : "#6c757d", background: "transparent" }}
+                        disabled={page === 1}
+                        onClick={() => onPageChange(1)}
+                    >
+                        <ChevronsLeft size={18} strokeWidth={2} />
+                    </button>
+                )}
+                <button
+                    className="btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle"
+                    style={{ width: 32, height: 32, padding: 0, color: page === 1 ? "#dee2e6" : "#6c757d", background: "transparent" }}
+                    disabled={page === 1}
+                    onClick={handlePrev}
+                >
+                    <ChevronLeft size={18} strokeWidth={2} />
+                </button>
 
-                    {pages.map((pageNumber) => (
-                        <li key={pageNumber} className={`page-item ${page === pageNumber ? "active" : ""}`}>
-                            <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center fw-medium" style={{ width: 32, height: 32, padding: 0, border: "none" }} onClick={() => onPageChange(pageNumber)}>
+                <div className="d-flex align-items-center mx-1 gap-1">
+                    {pages.map((pageNumber) => {
+                        const isActive = page === pageNumber;
+                        return (
+                            <button
+                                key={pageNumber}
+                                className={`btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle ${
+                                    isActive ? "btn-primary text-white shadow-sm fw-bold" : "text-secondary fw-medium"
+                                }`}
+                                style={{
+                                    width: 32,
+                                    height: 32,
+                                    padding: 0,
+                                    background: isActive ? "" : "transparent",
+                                    fontSize: "13px"
+                                }}
+                                onClick={() => onPageChange(pageNumber)}
+                            >
                                 {pageNumber}
                             </button>
-                        </li>
-                    ))}
+                        );
+                    })}
+                </div>
 
-                    <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                        <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center" style={{ width: 32, height: 32, padding: 0, border: "none" }} disabled={page === totalPages} onClick={handleNext}>
-                            <ChevronRight size={16} />
-                        </button>
-                    </li>
-                    {showFirstLast && (
-                        <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-                            <button className="page-link rounded shadow-sm d-flex align-items-center justify-content-center" style={{ width: 32, height: 32, padding: 0, border: "none" }} disabled={page === totalPages} onClick={() => onPageChange(totalPages)}>
-                                <ChevronsRight size={16} />
-                            </button>
-                        </li>
-                    )}
-                </ul>
-            </nav>
+                <button
+                    className="btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle"
+                    style={{ width: 32, height: 32, padding: 0, color: page === totalPages ? "#dee2e6" : "#6c757d", background: "transparent" }}
+                    disabled={page === totalPages}
+                    onClick={handleNext}
+                >
+                    <ChevronRight size={18} strokeWidth={2} />
+                </button>
+                {showFirstLast && (
+                    <button
+                        className="btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle"
+                        style={{ width: 32, height: 32, padding: 0, color: page === totalPages ? "#dee2e6" : "#6c757d", background: "transparent" }}
+                        disabled={page === totalPages}
+                        onClick={() => onPageChange(totalPages)}
+                    >
+                        <ChevronsRight size={18} strokeWidth={2} />
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

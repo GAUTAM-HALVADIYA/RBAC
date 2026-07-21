@@ -12,41 +12,40 @@ import { useRowExpansion } from "./hooks/useRowExpansion";
 import { useInlineEditing } from "./hooks/useInlineEditing";
 import { ExportMenu } from "./ExportMenu";
 import { ColumnPinMenu } from "./ColumnPinMenu";
+import { ColumnVisibilityMenu } from "./ColumnVisibilityMenu";
+import { Pagination } from "./Pagination";
 
-export function DataTable<T>({
-    data,
-    columns,
-    maxHeight = "550px",
-    sorting,
-    onSortingChange,
-    isLoading,
-    onCellEdit,
-    enableRowSelection,
-    onRowSelectionChange,
-    enableRowReordering,
-    onRowReorder,
-    renderExpandedRow,
-    getRowId,
-    tableId,
-    columnPinning,
-    onColumnPinningChange,
-}: DataTableProps<T>) {
+export function DataTable<T>(props: DataTableProps<T>) {
+    const {
+        data,
+        columns,
+        maxHeight = "550px",
+        isLoading,
+        onCellEdit,
+        tableId,
+    } = props;
     const storageKey = tableId ? `datatable-state-${tableId}` : null;
 
     const { expandedRowIds, toggleRowExpanded } = useRowExpansion();
 
     const { localData, draggedRowIndex, handleRowDragStart, handleRowDragOver, handleRowDragEnd } = useRowReordering(
         data,
-        enableRowReordering,
-        onRowReorder,
+        props.enableRowReordering,
+        props.enableRowReordering ? props.onRowReorder : undefined,
     );
 
-    const { selectedRowIds, toggleAllRows, toggleRow } = useRowSelection(localData, getRowId, onRowSelectionChange);
+    const { selectedRowIds, toggleAllRows, toggleRow } = useRowSelection(
+        localData, 
+        props.enableRowSelection ? props.getRowId : undefined, 
+        props.enableRowSelection ? props.onRowSelectionChange : undefined
+    );
 
     const { editingCell, editValue, setEditValue, startEditing, stopEditing } = useInlineEditing();
 
     const handleSort = (column: string) => {
-        onSortingChange(getNextSorting(sorting, column));
+        if (props.enableSorting) {
+            props.onSortingChange(getNextSorting(props.sorting, column));
+        }
     };
 
     const {
@@ -68,13 +67,21 @@ export function DataTable<T>({
 
     const { columnWidths, handleResizeStart } = useColumnResizing(columns, storageKey);
 
-    const activeColumns = orderedColumns.filter((col) => columnVisibility[col.id] !== false);
+    const activeColumns = props.enableColumnVisibility 
+        ? orderedColumns.filter((col) => columnVisibility[col.id] !== false)
+        : orderedColumns;
 
-    const leftPinnedColumns = activeColumns.filter((col) => columnPinning.left.includes(col.id));
+    const leftPinnedColumns = props.enableColumnPinning 
+        ? activeColumns.filter((col) => props.columnPinning.left.includes(col.id))
+        : [];
 
-    const centerColumns = activeColumns.filter((col) => !columnPinning.left.includes(col.id) && !columnPinning.right.includes(col.id));
+    const rightPinnedColumns = props.enableColumnPinning
+        ? activeColumns.filter((col) => props.columnPinning.right.includes(col.id))
+        : [];
 
-    const rightPinnedColumns = activeColumns.filter((col) => columnPinning.right.includes(col.id));
+    const centerColumns = activeColumns.filter(
+        (col) => !leftPinnedColumns.includes(col) && !rightPinnedColumns.includes(col)
+    );
 
     const finalColumns = [...leftPinnedColumns, ...centerColumns, ...rightPinnedColumns];
 
@@ -99,7 +106,8 @@ export function DataTable<T>({
     });
 
     const selectedRows = localData.filter((row) => {
-        const id = getRowId ? getRowId(row) : String((row as any)._id || (row as any).id);
+        if (!props.enableRowSelection) return false;
+        const id = props.getRowId ? props.getRowId(row) : String((row as any)._id || (row as any).id);
 
         return selectedRowIds.has(id);
     });
@@ -107,40 +115,19 @@ export function DataTable<T>({
     return (
         <div className="d-flex flex-column gap-3">
             <div className="d-flex justify-content-end" ref={dropdownRef}>
-                <ExportMenu rows={selectedRows} columns={finalColumns} />
-                <div className="dropdown position-relative ms-2">
-                    <button
-                        className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2"
-                        onClick={() => setShowColumnToggle(!showColumnToggle)}
-                    >
-                        <Settings2 size={16} /> Columns
-                    </button>
-                    {showColumnToggle && (
-                        <div
-                            className="dropdown-menu show position-absolute end-0 mt-1 shadow-sm p-2"
-                            style={{ zIndex: 1050, minWidth: "200px" }}
-                        >
-                            {columns.map((col) => (
-                                <div key={col.id} className="form-check mb-1">
-                                    <input
-                                        type="checkbox"
-                                        className="form-check-input"
-                                        id={`col-toggle-${col.id}`}
-                                        checked={columnVisibility[col.id] !== false}
-                                        onChange={() => toggleColumnVisibility(col.id)}
-                                    />
-                                    <label
-                                        className="form-check-label user-select-none"
-                                        htmlFor={`col-toggle-${col.id}`}
-                                        style={{ cursor: "pointer" }}
-                                    >
-                                        {col.header}
-                                    </label>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                {props.enableExport && (
+                    <ExportMenu rows={selectedRows.length > 0 ? selectedRows : localData} columns={finalColumns} fileName={props.exportFileName} />
+                )}
+                {props.enableColumnVisibility && (
+                    <ColumnVisibilityMenu
+                        columns={columns}
+                        columnVisibility={columnVisibility}
+                        toggleColumnVisibility={toggleColumnVisibility}
+                        showDropdown={showColumnToggle}
+                        setShowDropdown={setShowColumnToggle}
+                        dropdownRef={dropdownRef}
+                    />
+                )}
             </div>
             <div className="table-responsive" style={{ maxHeight, overflowY: "auto" }}>
                 <table className="table table-hover table-custom mb-0">
@@ -153,13 +140,13 @@ export function DataTable<T>({
                         }}
                     >
                         <tr>
-                            {renderExpandedRow && (
+                            {props.enableRowExpansion && (
                                 <th style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }}></th>
                             )}
-                            {enableRowReordering && (
+                            {props.enableRowReordering && (
                                 <th style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }}></th>
                             )}
-                            {enableRowSelection && (
+                            {props.enableRowSelection && (
                                 <th
                                     style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }}
                                     className="align-middle text-center py-3"
@@ -171,7 +158,7 @@ export function DataTable<T>({
                                             localData.length > 0 &&
                                             localData.every((row) =>
                                                 selectedRowIds.has(
-                                                    getRowId ? getRowId(row) : String((row as any)._id || (row as any).id),
+                                                    props.getRowId ? props.getRowId(row) : String((row as any)._id || (row as any).id),
                                                 ),
                                             )
                                         }
@@ -198,13 +185,13 @@ export function DataTable<T>({
                                         minWidth: columnWidths[col.id],
                                         maxWidth: columnWidths[col.id],
                                         position:
-                                            columnPinning.left.includes(col.id) || columnPinning.right.includes(col.id)
+                                            (props.enableColumnPinning && (props.columnPinning.left.includes(col.id) || props.columnPinning.right.includes(col.id)))
                                                 ? "sticky"
                                                 : "relative",
 
-                                        left: columnPinning.left.includes(col.id) ? leftOffsets[col.id] : undefined,
+                                        left: (props.enableColumnPinning && props.columnPinning.left.includes(col.id)) ? leftOffsets[col.id] : undefined,
 
-                                        right: columnPinning.right.includes(col.id) ? rightOffsets[col.id] : undefined,
+                                        right: (props.enableColumnPinning && props.columnPinning.right.includes(col.id)) ? rightOffsets[col.id] : undefined,
 
                                         zIndex: 0,
                                     }}
@@ -220,23 +207,25 @@ export function DataTable<T>({
                                         >
                                             {col.header}
 
-                                            {col.enableSorting && (
+                                            {col.enableSorting && props.enableSorting && (
                                                 <>
-                                                    {sorting.column !== col.id && <ArrowUpDownIcon />}
+                                                    {props.sorting.column !== col.id && <ArrowUpDownIcon />}
 
-                                                    {sorting.column === col.id && sorting.direction === "asc" && <SortAscIcon />}
+                                                    {props.sorting.column === col.id && props.sorting.direction === "asc" && <SortAscIcon />}
 
-                                                    {sorting.column === col.id && sorting.direction === "desc" && <SortDescIcon />}
+                                                    {props.sorting.column === col.id && props.sorting.direction === "desc" && <SortDescIcon />}
                                                 </>
                                             )}
                                         </div>
 
                                         <div className="d-flex align-items-center gap-1">
-                                            <ColumnPinMenu
-                                                columnId={col.id}
-                                                columnPinning={columnPinning}
-                                                onColumnPinningChange={onColumnPinningChange}
-                                            />
+                                            {props.enableColumnPinning && (
+                                                <ColumnPinMenu
+                                                    columnId={col.id}
+                                                    columnPinning={props.columnPinning}
+                                                    onColumnPinningChange={props.onColumnPinningChange}
+                                                />
+                                            )}
 
                                             <GripVertical
                                                 className="resize-handle"
@@ -253,7 +242,7 @@ export function DataTable<T>({
                         {isLoading ? (
                             Array.from({ length: 5 }).map((_, i) => (
                                 <tr key={`skeleton-${i}`}>
-                                    {renderExpandedRow && (
+                                    {props.enableRowExpansion && (
                                         <td className="align-middle p-3 placeholder-glow" style={{ width: 40 }}>
                                             <span
                                                 className="placeholder bg-secondary opacity-25 rounded w-100"
@@ -261,7 +250,7 @@ export function DataTable<T>({
                                             ></span>
                                         </td>
                                     )}
-                                    {enableRowReordering && (
+                                    {props.enableRowReordering && (
                                         <td className="align-middle p-3 placeholder-glow" style={{ width: 36 }}>
                                             <span
                                                 className="placeholder bg-secondary opacity-25 rounded w-100"
@@ -269,7 +258,7 @@ export function DataTable<T>({
                                             ></span>
                                         </td>
                                     )}
-                                    {enableRowSelection && (
+                                    {props.enableRowSelection && (
                                         <td className="align-middle p-3 placeholder-glow" style={{ width: 36 }}>
                                             <span
                                                 className="placeholder bg-secondary opacity-25 rounded w-100"
@@ -296,9 +285,9 @@ export function DataTable<T>({
                                 <td
                                     colSpan={
                                         finalColumns.length +
-                                        (enableRowReordering ? 1 : 0) +
-                                        (enableRowSelection ? 1 : 0) +
-                                        (renderExpandedRow ? 1 : 0)
+                                        (props.enableRowReordering ? 1 : 0) +
+                                        (props.enableRowSelection ? 1 : 0) +
+                                        (props.enableRowExpansion ? 1 : 0)
                                     }
                                     className="text-center py-4 text-muted"
                                 >
@@ -307,14 +296,14 @@ export function DataTable<T>({
                             </tr>
                         ) : (
                             localData.map((row, rowIndex) => {
-                                const rowId = getRowId ? getRowId(row) : String((row as any)._id || (row as any).id);
+                                const rowId = props.getRowId ? props.getRowId(row) : String((row as any)._id || (row as any).id);
                                 const isExpanded = expandedRowIds.has(rowId);
 
                                 return (
                                    <React.Fragment key={rowIndex}>
                                   
                                         <tr
-                                            draggable={enableRowReordering}
+                                            draggable={props.enableRowReordering}
                                             onDragStart={(e) => handleRowDragStart(e, rowIndex)}
                                             onDragOver={(e) => handleRowDragOver(e, rowIndex)}
                                             onDragEnd={handleRowDragEnd}
@@ -323,7 +312,7 @@ export function DataTable<T>({
                                                 backgroundColor: draggedRowIndex === rowIndex ? "#f8f9fa" : "inherit",
                                             }}
                                         >
-                                            {renderExpandedRow && (
+                                            {props.enableRowExpansion && (
                                                 <td
                                                     className="align-middle text-center"
                                                     style={{ width: 36, cursor: "pointer" }}
@@ -332,7 +321,7 @@ export function DataTable<T>({
                                                     {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                                                 </td>
                                             )}
-                                            {enableRowReordering && (
+                                            {props.enableRowReordering && (
                                                 <td
                                                     className="align-middle text-center text-muted"
                                                     style={{ cursor: "grab", width: 36 }}
@@ -340,13 +329,13 @@ export function DataTable<T>({
                                                     <GripHorizontal size={16} />
                                                 </td>
                                             )}
-                                            {enableRowSelection && (
+                                            {props.enableRowSelection && (
                                                 <td className="align-middle text-center" style={{ width: 36 }}>
                                                     <input
                                                         type="checkbox"
                                                         className="form-check-input"
                                                         checked={selectedRowIds.has(
-                                                            getRowId ? getRowId(row) : String((row as any)._id || (row as any).id),
+                                                            props.getRowId ? props.getRowId(row) : String((row as any)._id || (row as any).id),
                                                         )}
                                                         onChange={(e) => toggleRow(row, e.target.checked)}
                                                     />
@@ -401,16 +390,15 @@ export function DataTable<T>({
                                                             textOverflow: isEditing ? "clip" : "ellipsis",
                                                             whiteSpace: "nowrap",
                                                             position:
-                                                                columnPinning.left.includes(col.id) ||
-                                                                columnPinning.right.includes(col.id)
+                                                                (props.enableColumnPinning && (props.columnPinning.left.includes(col.id) || props.columnPinning.right.includes(col.id)))
                                                                     ? "sticky"
                                                                     : "relative",
 
-                                                            left: columnPinning.left.includes(col.id)
+                                                            left: (props.enableColumnPinning && props.columnPinning.left.includes(col.id))
                                                                 ? leftOffsets[col.id]
                                                                 : undefined,
 
-                                                            right: columnPinning.right.includes(col.id)
+                                                            right: (props.enableColumnPinning && props.columnPinning.right.includes(col.id))
                                                                 ? rightOffsets[col.id]
                                                                 : undefined,
 
@@ -439,18 +427,18 @@ export function DataTable<T>({
                                                 );
                                             })}
                                         </tr>
-                                        {isExpanded && renderExpandedRow && (
+                                        {isExpanded && props.enableRowExpansion && (
                                             <tr>
                                                 <td
                                                     colSpan={
                                                         finalColumns.length +
-                                                        (enableRowReordering ? 1 : 0) +
-                                                        (enableRowSelection ? 1 : 0) +
+                                                        (props.enableRowReordering ? 1 : 0) +
+                                                        (props.enableRowSelection ? 1 : 0) +
                                                         1
                                                     }
                                                     className="p-0 border-0"
                                                 >
-                                                    {renderExpandedRow(row)}
+                                                    {props.renderExpandedRow(row)}
                                                 </td>
                                             </tr>
                                         )}
@@ -461,6 +449,9 @@ export function DataTable<T>({
                     </tbody>
                 </table>
             </div>
+            {props.enablePagination && (
+                <Pagination {...(props as any)} />
+            )}
         </div>
     );
 }

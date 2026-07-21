@@ -8,12 +8,13 @@ export function useRoles() {
     const [error, setError] = useState('');
     const [meta, setMeta] = useState<any>(null);
     const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
 
-    const fetchRoles = useCallback(async (currentPage: number = page, limit: number = 10) => {
+    const fetchRoles = useCallback(async (currentPage: number = page, currentLimit: number = limit) => {
         try {
             setLoading(true);
             setError('');
-            const res = await getRoles({ page: currentPage, limit });
+            const res = await getRoles({ page: currentPage, limit: currentLimit });
             setRoles(res.data);
             if (res.meta) setMeta(res.meta);
         } catch (err) {
@@ -70,6 +71,8 @@ export function useRoles() {
         meta,
         page,
         setPage,
+        limit,
+        setLimit,
         fetchRoles,
         handleCreateRole,
         handleUpdateRole,

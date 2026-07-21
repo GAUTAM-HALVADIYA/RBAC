@@ -37,5 +37,6 @@ export const getPaginatedMetadata = (
     totalRecords,
     totalPages,
     currentPage: page,
+    limit,
   };
 };
