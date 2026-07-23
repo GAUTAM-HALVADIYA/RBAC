@@ -8,7 +8,20 @@ import type { SortingState } from "../components/data-table/types";
 import { useColumnPinning } from "../components/data-table/hooks/useColumnPinning";
 
 export default function Users() {
-    const { users, loading, error, meta, page, setPage, limit, setLimit, fetchUsers, handleUpdateUser, handleDeleteUser } = useUsers();
+    const {
+        users,
+        loading,
+        error,
+        meta,
+        page,
+        setPage,
+        limit,
+        setLimit,
+        fetchUsers,
+        handleUpdateUser,
+        handleDeleteUser,
+        handleCreateUser,
+    } = useUsers();
     const [roles, setRoles] = useState<any[]>([]);
 
     const [showEditModal, setShowEditModal] = useState(false);
@@ -19,6 +32,17 @@ export default function Users() {
     const [sorting, setSorting] = useState<SortingState>({ column: null, direction: null });
     const { columnPinning, setColumnPinning } = useColumnPinning();
     const [selectedRows, setSelectedRows] = useState<User[]>([]);
+
+    const [showCreateModal, setShowCreateModal] = useState(false);
+
+    const [createFormData, setCreateFormData] = useState({
+        name: "",
+        email: "",
+        password: "",
+        role: "",
+    });
+
+    const [createError, setCreateError] = useState("");
 
     useEffect(() => {
         fetchUsers();
@@ -62,13 +86,133 @@ export default function Users() {
         }
     };
 
+    const onCreateSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        setCreateError("");
+
+        const res = await handleCreateUser(createFormData);
+
+        if (res.success) {
+            setShowCreateModal(false);
+
+            setCreateFormData({
+                name: "",
+                email: "",
+                password: "",
+                role: "",
+            });
+        } else {
+            setCreateError(res.error ?? "Create failed");
+        }
+    };
+
     return (
         <>
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <Header title="Users Management" />
+                <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
+                    + Add User
+                </button>
             </div>
 
             {error && <div className="alert alert-danger">{error}</div>}
+
+            {showCreateModal && (
+                <div
+                    className="modal d-block"
+                    style={{
+                        background: "rgba(0,0,0,.4)",
+                    }}
+                >
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5>Add User</h5>
+
+                                <button className="btn-close" onClick={() => setShowCreateModal(false)} />
+                            </div>
+
+                            <form onSubmit={onCreateSubmit}>
+                                <div className="modal-body">
+                                    {createError && <div className="alert alert-danger">{createError}</div>}
+
+                                    <input
+                                        className="form-control mb-3"
+                                        placeholder="Name"
+                                        value={createFormData.name}
+                                        onChange={(e) =>
+                                            setCreateFormData({
+                                                ...createFormData,
+
+                                                name: e.target.value,
+                                            })
+                                        }
+                                    />
+
+                                    <input
+                                        className="form-control mb-3"
+                                        placeholder="Email"
+                                        type="email"
+                                        value={createFormData.email}
+                                        onChange={(e) =>
+                                            setCreateFormData({
+                                                ...createFormData,
+
+                                                email: e.target.value,
+                                            })
+                                        }
+                                    />
+
+                                    <input
+                                        className="form-control mb-3"
+                                        placeholder="Password"
+                                        type="password"
+                                        value={createFormData.password}
+                                        onChange={(e) =>
+                                            setCreateFormData({
+                                                ...createFormData,
+
+                                                password: e.target.value,
+                                            })
+                                        }
+                                    />
+
+                                    <select
+                                        className="form-select"
+                                        value={createFormData.role}
+                                        onChange={(e) =>
+                                            setCreateFormData({
+                                                ...createFormData,
+
+                                                role: e.target.value,
+                                            })
+                                        }
+                                    >
+                                        <option value="">Select Role</option>
+
+                                        {roles.map((role) => (
+                                            <option key={role._id} value={role._id}>
+                                                {role.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="modal-footer">
+                                    <button className="btn btn-secondary" type="button" onClick={() => setShowCreateModal(false)}>
+                                        Cancel
+                                    </button>
+
+                                    <button className="btn btn-primary" type="submit">
+                                        Create User
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="card border-0 shadow-sm">
                 <div className="card-body">
@@ -157,7 +301,6 @@ export default function Users() {
                                                 </option>
                                             ))}
                                         </select>
-                                        
                                     </div>
                                 </div>
                                 <div className="modal-footer bg-body-tertiary  border-top-0 pt-3 pb-4 px-4">

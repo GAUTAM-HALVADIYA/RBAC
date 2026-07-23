@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate, dynamicAuthorize } from "../middleware/auth";
 import { UserController } from "../controllers/user.controller";
-import { updateUserSchema } from "../validators/user.validator";
+import { createUserSchema, updateUserSchema } from "../validators/user.validator";
 import { validator } from "../middleware/validator.middleware";
 import { MODULES } from "../constants/modules.constants";
 import { upload } from "../middleware/upload.middleware";
@@ -12,7 +12,8 @@ let user = new UserController();
 userRouter.use(authenticate);
 
 userRouter.get("/", dynamicAuthorize(MODULES.USERS, "read"), user.getUsers);
-userRouter.get("/profile", user.getProfile); // Or do we want dynamicAuthorize for profile?
+userRouter.post("/", dynamicAuthorize(MODULES.USERS, "write"), validator(createUserSchema), user.createUsers);
+userRouter.get("/profile", user.getProfile);
 userRouter.patch("/profile", validator(updateUserSchema), user.updateProfile);
 userRouter.post("/profile/avatar", upload.single("file"), user.uploadAvatar);
 userRouter.delete("/profile/avatar", user.deleteAvatar);

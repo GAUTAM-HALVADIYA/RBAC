@@ -1,7 +1,5 @@
 import auditLogModel from "../models/audit-log.model";
-import { AppError } from "../utils/AppError";
-import { HTTP_STATUS } from "../constants/http-status.constants";
-import { PaginationOptions, getPaginatedMetadata, getPaginationOptions } from "../utils/pagination.util";
+import { getPaginatedMetadata, getPaginationOptions } from "../utils/pagination.util";
 
 export class AuditLogService {
     async logActivity(

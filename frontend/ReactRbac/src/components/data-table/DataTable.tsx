@@ -211,7 +211,7 @@ export function DataTable<T>(props: DataTableProps<T>) {
 
                                             {col.enableSorting && props.enableSorting && props.sorting.column === col.id && (
                                                 <span className="text-primary flex-shrink-0">
-                                                    {props.sorting.direction === "asc" ? <SortAscIcon size={14} /> : <SortDescIcon size={14} />}
+                                                    {props.sorting.direction === "asc" ? <SortAscIcon size={16} /> : <SortDescIcon size={16} />}
                                                 </span>
                                             )}
                                         </div>
@@ -233,13 +233,13 @@ export function DataTable<T>(props: DataTableProps<T>) {
                                             className="resize-handle"
                                             onMouseDown={(e) => handleResizeStart(e, col.id)}
                                             style={{
-                                                width: '1px',
+                                                width: '2px',
                                                 cursor: 'col-resize',
-                                                height: '60%',
+                                                height: '100%',
                                                 backgroundColor: 'var(--bs-secondary-color)',
                                                 position: 'absolute',
                                                 right: 0,
-                                                top: '20%',
+                                                top: '50%',
                                                 zIndex: 1,
                                                 opacity: 0.5
                                             }}

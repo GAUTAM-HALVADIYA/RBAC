@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { UserService } from "../services/user.service";
 import { HTTP_STATUS } from "../constants/http-status.constants";
+import { CreateUserDto } from "../dto/user.dto";
 
 const userService = new UserService();
 
@@ -10,6 +11,15 @@ export class UserController {
             const currentUserId = req.user?._id.toString();
             const { data, meta } = await userService.getUsers(req.query, currentUserId);
             res.status(HTTP_STATUS.OK).json({ success: true, data, meta });
+        } catch (error) {
+            next(error);
+        }
+    };
+    createUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        try {
+            const data: CreateUserDto = req.body
+            const responce = await userService.createUsers(data);
+            res.status(HTTP_STATUS.OK).json({ success: true, data: responce, message: "User created successfully" });
         } catch (error) {
             next(error);
         }

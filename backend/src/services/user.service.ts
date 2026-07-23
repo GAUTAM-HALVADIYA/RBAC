@@ -5,9 +5,10 @@ import moduleModel from "../models/module.model";
 import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/http-status.constants";
 import { MESSAGES } from "../constants/messages.constants";
-import { UpdateUserDto } from "../dto/user.dto";
+import { CreateUserDto, UpdateUserDto } from "../dto/user.dto";
 import { PaginationOptions, getPaginatedMetadata, getPaginationOptions } from "../utils/pagination.util";
 import { cloudinary } from "../middleware/upload.middleware";
+import bcrypt from "bcrypt";
 
 export class UserService {
     async getUsers(query: Record<string, any> = {}, currentUserId?: string) {
@@ -49,6 +50,27 @@ export class UserService {
         const meta = getPaginatedMetadata(totalRecords, options.page, options.limit);
 
         return { data, meta };
+    }
+    async createUsers(data: CreateUserDto) {
+        const { email, password, role } = data;
+
+        const existingUser = await userModel.findOne({ email });
+        if (existingUser) {
+            throw new AppError(HTTP_STATUS.CONFLICT, MESSAGES.EMAIL_EXISTS);
+        }
+
+        const existRole = await roleModel.findById(role);
+        if (!existRole) {
+            throw new AppError(HTTP_STATUS.NOT_FOUND, MESSAGES.ROLE_NOT_FOUND);
+        }
+
+        const hashPassword = await bcrypt.hash(password, 10);
+        const newUser = await userModel.create({
+            ...data,
+            password: hashPassword,
+            isVerified: true,
+        });
+        return { id: newUser._id, email: newUser.email };
     }
 
     async getUserById(id: string) {

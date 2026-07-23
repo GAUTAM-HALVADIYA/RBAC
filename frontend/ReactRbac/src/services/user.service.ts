@@ -54,3 +54,9 @@ export const deleteAvatar = async () => {
     const response = await api.delete("/users/profile/avatar");
     return response.data;
 };
+
+export const createUser = async (data: { name: string; email: string; password: string; role: string }) => {
+    const response = await api.post("/users", data);
+
+    return response.data;
+};
