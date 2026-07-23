@@ -1,6 +1,6 @@
 export default function NotFound() {
     return (
-        <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light text-center">
+        <div className="d-flex align-items-center justify-content-center min-vh-100 bg-body-tertiary text-center">
             <div className="container">
                 <h1 className="fw-bold" style={{ fontSize: "8rem", color: "#dee2e6" }}>
                     404

@@ -24,7 +24,7 @@ export default function ForgotPassword() {
     };
 
     return (
-        <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+        <div className="d-flex align-items-center justify-content-center min-vh-100 bg-body-tertiary">
             <div className="container d-flex justify-content-center">
                 <div className="card  border-0 shadow-lg" style={{ width: "100%", maxWidth: "400px" }}>
                     <div className="card-body p-5">

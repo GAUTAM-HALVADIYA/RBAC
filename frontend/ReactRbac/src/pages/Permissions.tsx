@@ -177,7 +177,7 @@ export default function Permissions({ roleId, moduleId, isEmbedded }: { roleId?:
                         enableColumnVisibility={true}
                         enableRowExpansion={true}
                         renderExpandedRow={(row) => (
-                            <div className="bg-light p-3 border-bottom shadow-sm">
+                            <div className="bg-body-tertiary p-3 border-bottom shadow-sm">
                                 <strong>Detailed Info:</strong>
                                 <p className="mb-0 text-muted">
                                     Role ID: {row.roleId._id} <br />

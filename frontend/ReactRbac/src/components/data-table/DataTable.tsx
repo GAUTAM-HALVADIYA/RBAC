@@ -11,7 +11,8 @@ import { useRowSelection } from "./hooks/useRowSelection";
 import { useRowExpansion } from "./hooks/useRowExpansion";
 import { useInlineEditing } from "./hooks/useInlineEditing";
 import { ExportMenu } from "./ExportMenu";
-import { ColumnPinMenu } from "./ColumnPinMenu";
+import { ColumnFilterMenu } from "./ColumnFilterMenu";
+import { ColumnHeaderMenu } from "./ColumnHeaderMenu";
 import { ColumnVisibilityMenu } from "./ColumnVisibilityMenu";
 import { Pagination } from "./Pagination";
 
@@ -136,19 +137,19 @@ export function DataTable<T>(props: DataTableProps<T>) {
                             position: "sticky",
                             top: 0,
                             zIndex: 1,
-                            backgroundColor: "#fff",
+                            backgroundColor: "var(--bs-body-bg)",
                         }}
                     >
                         <tr>
                             {props.enableRowExpansion && (
-                                <th style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }}></th>
+                                <th style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid var(--bs-border-color)" }}></th>
                             )}
                             {props.enableRowReordering && (
-                                <th style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }}></th>
+                                <th style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid var(--bs-border-color)" }}></th>
                             )}
                             {props.enableRowSelection && (
                                 <th
-                                    style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid #dee2e6" }}
+                                    style={{ width: 36, minWidth: 36, maxWidth: 36, borderBottom: "2px solid var(--bs-border-color)" }}
                                     className="align-middle text-center py-3"
                                 >
                                     <input
@@ -176,9 +177,9 @@ export function DataTable<T>(props: DataTableProps<T>) {
                                     onDrop={(e) => handleDrop(e, col.id)}
                                     onDragEnd={handleDragEnd}
                                     style={{
-                                        backgroundColor: draggedColumnId === col.id ? "#f8f9fa" : "#fff",
+                                        backgroundColor: draggedColumnId === col.id ? "var(--bs-secondary-bg)" : "var(--bs-body-bg)",
                                         opacity: draggedColumnId === col.id ? 0.5 : 1,
-                                        borderBottom: "2px solid #dee2e6",
+                                        borderBottom: "2px solid var(--bs-border-color)",
                                         cursor: col.enableSorting ? "pointer" : "grab",
                                         userSelect: "none",
                                         width: columnWidths[col.id],
@@ -196,43 +197,53 @@ export function DataTable<T>(props: DataTableProps<T>) {
                                         zIndex: 0,
                                     }}
                                 >
-                                    <div className="d-flex justify-content-between align-items-center">
+                                    <div className="d-flex justify-content-between align-items-center w-100 h-100 position-relative group-hover">
                                         <div
-                                            className="d-flex align-items-center gap-2"
+                                            className="d-flex align-items-center gap-2 flex-grow-1 overflow-hidden"
                                             onClick={() => {
                                                 if (col.enableSorting) {
                                                     handleSort(col.id);
                                                 }
                                             }}
+                                            style={{ cursor: col.enableSorting ? "pointer" : "default" }}
                                         >
-                                            {col.header}
+                                            <span className="text-truncate">{col.header}</span>
 
-                                            {col.enableSorting && props.enableSorting && (
-                                                <>
-                                                    {props.sorting.column !== col.id && <ArrowUpDownIcon />}
-
-                                                    {props.sorting.column === col.id && props.sorting.direction === "asc" && <SortAscIcon />}
-
-                                                    {props.sorting.column === col.id && props.sorting.direction === "desc" && <SortDescIcon />}
-                                                </>
+                                            {col.enableSorting && props.enableSorting && props.sorting.column === col.id && (
+                                                <span className="text-primary flex-shrink-0">
+                                                    {props.sorting.direction === "asc" ? <SortAscIcon size={14} /> : <SortDescIcon size={14} />}
+                                                </span>
                                             )}
                                         </div>
 
-                                        <div className="d-flex align-items-center gap-1">
-                                            {props.enableColumnPinning && (
-                                                <ColumnPinMenu
-                                                    columnId={col.id}
-                                                    columnPinning={props.columnPinning}
-                                                    onColumnPinningChange={props.onColumnPinningChange}
-                                                />
-                                            )}
-
-                                            <GripVertical
-                                                className="resize-handle"
-                                                onMouseDown={(e) => handleResizeStart(e, col.id)}
-                                                size={18}
+                                        <div className="d-flex align-items-center flex-shrink-0 ms-2 me-3">
+                                            <ColumnFilterMenu />
+                                            <ColumnHeaderMenu
+                                                columnId={col.id}
+                                                enableSorting={col.enableSorting && props.enableSorting}
+                                                sorting={props.sorting}
+                                                onSortingChange={props.onSortingChange}
+                                                enableColumnPinning={props.enableColumnPinning}
+                                                columnPinning={props.columnPinning}
+                                                onColumnPinningChange={props.onColumnPinningChange}
                                             />
                                         </div>
+
+                                        <div
+                                            className="resize-handle"
+                                            onMouseDown={(e) => handleResizeStart(e, col.id)}
+                                            style={{
+                                                width: '1px',
+                                                cursor: 'col-resize',
+                                                height: '60%',
+                                                backgroundColor: 'var(--bs-secondary-color)',
+                                                position: 'absolute',
+                                                right: 0,
+                                                top: '20%',
+                                                zIndex: 1,
+                                                opacity: 0.5
+                                            }}
+                                        />
                                     </div>
                                 </th>
                             ))}
@@ -309,7 +320,7 @@ export function DataTable<T>(props: DataTableProps<T>) {
                                             onDragEnd={handleRowDragEnd}
                                             style={{
                                                 opacity: draggedRowIndex === rowIndex ? 0.5 : 1,
-                                                backgroundColor: draggedRowIndex === rowIndex ? "#f8f9fa" : "inherit",
+                                                backgroundColor: draggedRowIndex === rowIndex ? "var(--bs-secondary-bg)" : "inherit",
                                             }}
                                         >
                                             {props.enableRowExpansion && (
@@ -402,7 +413,7 @@ export function DataTable<T>(props: DataTableProps<T>) {
                                                                 ? rightOffsets[col.id]
                                                                 : undefined,
 
-                                                            background: "#fff",
+                                                            background: "var(--bs-body-bg)",
 
                                                             zIndex: 0
                                                         }}

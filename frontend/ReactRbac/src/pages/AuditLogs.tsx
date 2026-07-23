@@ -41,12 +41,12 @@ export default function AuditLogs() {
                                     logs.map((log) => (
                                         <tr key={log._id}>
                                             <td className="align-middle fw-medium">
-                                                <code className="bg-light px-2 py-1 rounded border text-dark">{log.action}</code>
+                                                <code className="bg-body-tertiary px-2 py-1 rounded border ">{log.action}</code>
                                             </td>
                                             <td className="align-middle text-muted">
                                                 {log.userId ? (
                                                     <div>
-                                                        <div className="fw-medium text-dark">{log.userId.name}</div>
+                                                        <div className="fw-medium ">{log.userId.name}</div>
                                                         <div className="small">{log.userId.email}</div>
                                                     </div>
                                                 ) : (

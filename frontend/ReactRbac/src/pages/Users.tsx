@@ -115,7 +115,7 @@ export default function Users() {
                 >
                     <div className="modal-dialog modal-dialog-centered">
                         <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                            <div className="modal-header bg-light  border-bottom-0 pb-3 pt-4 px-4">
+                            <div className="modal-header bg-body-tertiary  border-bottom-0 pb-3 pt-4 px-4">
                                 <h5 className="modal-title fw-bold text-dark fs-5">Edit User</h5>
                                 <button
                                     type="button"
@@ -160,7 +160,7 @@ export default function Users() {
                                         
                                     </div>
                                 </div>
-                                <div className="modal-footer bg-light  border-top-0 pt-3 pb-4 px-4">
+                                <div className="modal-footer bg-body-tertiary  border-top-0 pt-3 pb-4 px-4">
                                     <button
                                         type="button"
                                         className="btn btn-light px-4 py-2 text-muted fw-medium border shadow-sm"

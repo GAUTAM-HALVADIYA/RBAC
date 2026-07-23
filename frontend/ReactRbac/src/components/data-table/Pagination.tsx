@@ -93,7 +93,7 @@ export function Pagination(props: PaginationProps) {
                 {showFirstLast && (
                     <button
                         className="btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle"
-                        style={{ width: 32, height: 32, padding: 0, color: page === 1 ? "#dee2e6" : "#6c757d", background: "transparent" }}
+                        style={{ width: 32, height: 32, padding: 0, color: page === 1 ? "var(--bs-tertiary-color)" : "var(--bs-secondary-color)", background: "transparent" }}
                         disabled={page === 1}
                         onClick={() => onPageChange(1)}
                     >
@@ -102,7 +102,7 @@ export function Pagination(props: PaginationProps) {
                 )}
                 <button
                     className="btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle"
-                    style={{ width: 32, height: 32, padding: 0, color: page === 1 ? "#dee2e6" : "#6c757d", background: "transparent" }}
+                    style={{ width: 32, height: 32, padding: 0, color: page === 1 ? "var(--bs-tertiary-color)" : "var(--bs-secondary-color)", background: "transparent" }}
                     disabled={page === 1}
                     onClick={handlePrev}
                 >
@@ -135,7 +135,7 @@ export function Pagination(props: PaginationProps) {
 
                 <button
                     className="btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle"
-                    style={{ width: 32, height: 32, padding: 0, color: page === totalPages ? "#dee2e6" : "#6c757d", background: "transparent" }}
+                    style={{ width: 32, height: 32, padding: 0, color: page === totalPages ? "var(--bs-tertiary-color)" : "var(--bs-secondary-color)", background: "transparent" }}
                     disabled={page === totalPages}
                     onClick={handleNext}
                 >
@@ -144,7 +144,7 @@ export function Pagination(props: PaginationProps) {
                 {showFirstLast && (
                     <button
                         className="btn btn-sm d-flex align-items-center justify-content-center border-0 rounded-circle"
-                        style={{ width: 32, height: 32, padding: 0, color: page === totalPages ? "#dee2e6" : "#6c757d", background: "transparent" }}
+                        style={{ width: 32, height: 32, padding: 0, color: page === totalPages ? "var(--bs-tertiary-color)" : "var(--bs-secondary-color)", background: "transparent" }}
                         disabled={page === totalPages}
                         onClick={() => onPageChange(totalPages)}
                     >
